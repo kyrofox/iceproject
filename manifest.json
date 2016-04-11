@@ -8,12 +8,13 @@
     "permissions": [],
 	"content_scripts": [
         {
-          "matches": ["<all_urls>"],
-          "js": ["icepage.js"]
+          "matches": ["*://*.imgur.com/*", "https://*.google.com/*"],
+          "js": ["jquery-2.2.2.min.js", "icepage.js"],
+		   "css": ["ice.css"]
         }
     ],
     "background": {
         "persistent": true,
-        "scripts": ["icebg.js"]
+		"page": "icebg.html"
     }
 }
