@@ -3,13 +3,8 @@
 //<on every page>
 var iceTagMenu = $('<div id="iceTagMenu">' +
 		'<div id="iceTagList">' +
-			'<span class="iceTag"> <span class="iceTagSquare">✔</span> <span class="iceTagText">tag example</span></span>' +
-			'<span class="iceTag"> <span class="iceTagSquare">✔</span> <span class="iceTagText">tag example</span></span>' +
-			'<span class="iceTag"> <span class="iceTagSquare"></span> <span class="iceTagText">tag example</span></span>' +
-			'<span class="iceTag"> <span class="iceTagSquare"></span> <span class="iceTagText">tag example</span></span>' +
-			'<span class="iceTag"> <span class="iceTagSquare"></span> <span class="iceTagText">tag example</span></span>' +
-			'<input type="text">' +
 		'</div>' +
+		'<input type="text">' +
 '</div>');
 
 $("#under-image > div > span.favorite-image").click(function() {
@@ -20,7 +15,26 @@ $("#under-image > div > span.favorite-image").click(function() {
 	}
 });
 
+function makeTag(checked, tagName) {
+	var newTag = $('<span class="iceTag ' + (checked ? "checked" : "") + '"><span class="iceTagSquare">✔</span> <span class="iceTagText">' + tagName + '</span></span>' );
+	newTag.click(function() {
+		if (newTag.hasClass("checked")) {
+			newTag.removeClass("checked");
+			//send message to background to remove tag
+		} else {
+			newTag.addClass("checked");
+			//send message to background to add tag
+		}
+	});
+	return newTag;
+}
+
+iceTagMenu.find("#iceTagList").append(makeTag(false, "yo"));
+
+
 $('#under-image').append(iceTagMenu);
+
+
 
 console.log("hello");
 

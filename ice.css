@@ -16,12 +16,16 @@
 	display: inline-block;
 	width:9px;
 	height:9px;
-	color: #f2f2f2;
+	color: #4C4C4C;
 	border-radius: 2px;
 	font-size: 9px;
 	line-height: 110%;
 	padding-left: 1px;
 	padding-top: 1px;
+}
+
+.checked .iceTagSquare {
+	color: #f2f2f2;
 }
 
 .iceTag:hover {
