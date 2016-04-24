@@ -5,16 +5,20 @@
     "description": "A Chrome extension made by the Imgur Community.",
     "version": "1.0.0",
     "icons": { },
-    "permissions": [],
+    "permissions": [
+		"storage"
+	],
 	"content_scripts": [
         {
           "matches": ["*://*.imgur.com/*", "https://*.google.com/*"],
           "js": ["jquery-2.2.2.min.js", "icepage.js"],
-		   "css": ["ice.css"]
+		   "css": ["ice.css"],
+		   "run_at": "document_end"
         }
     ],
     "background": {
         "persistent": true,
-		"page": "icebg.html"
+		"page": "icebg.html",
+		"js": "icebg.js"
     }
 }
