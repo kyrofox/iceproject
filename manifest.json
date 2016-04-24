@@ -10,7 +10,7 @@
 	],
 	"content_scripts": [
         {
-          "matches": ["*://*.imgur.com/*", "https://*.google.com/*"],
+          "matches": ["*://*.imgur.com/*"],
           "js": ["jquery-2.2.2.min.js", "icepage.js"],
 		   "css": ["ice.css"],
 		   "run_at": "document_end"
