@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	}
 	return true;
 });
-
+/* prioritize tags based on how many use them
 
 		/*
 	console.log(sender.tab ?
@@ -44,7 +44,6 @@ function handlePageReq(req, sender, sendResponse) {
 			} else {
 				resp.push(req.info.tag);
 				chrome.storage.local.set({"all_of_teh_tags": resp});
-				addTagToPost(req);
 				respond({success: true});
 			}
 			

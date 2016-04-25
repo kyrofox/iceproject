@@ -52,3 +52,9 @@
 .iceTagText {
 	padding-left: 10px;
 }
+
+#iceTagList {
+	height: 0px;
+	transition: height 0.5s;
+	overflow: hidden;
+}

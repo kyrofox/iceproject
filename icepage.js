@@ -13,6 +13,7 @@
 })();
 
 function main() {
+	$("#iceTagMenu").remove(); //if it already exists.
 	var iceTagMenu = $('<div id="iceTagMenu">' +
 		'<div id="iceTagList">' +
 		'</div>' +
@@ -24,7 +25,7 @@ function main() {
 			if (newTag.hasClass("checked")) {
 				//send message to background to remove tag
 				newTag.removeClass("checked");
-				msgBg("removeTag", { "galleryId": getGalleryId(), "tag": tagName	});
+				msgBg("removeTag", { "galleryId": getGalleryId(), "tag": tagName});
 			} else {
 				newTag.addClass("checked");
 				msgBg("addTag", { "galleryId": getGalleryId(), "tag": tagName });
@@ -44,29 +45,53 @@ function main() {
 					galleryPost.tags.indexOf(allTags[i]) > -1,
 					allTags[i]));
 			}
+			
+			iceTagMenu.find("#iceTagList").height(iceTagMenu.find("#iceTagList").find("span").outerHeight(true) * allTags.length + "px");
 		});
-	});
+	});  
 	
 	$('#under-image').append(iceTagMenu);
-	$("#newTag").keypress(function (e) {
+	$("#iceTagMenu").find("input").keypress(function (e) {
 		if (e.which == 13) {
 			// check if it exists already
 			// if it doesn't, add it to allTags
-			msgBg("addNewTag", {"tag": $("#newTag").val()}, function(resp) {
-				if (resp.success === true) {
-					msgBg("addTag", {
-						galleryId: getGalleryId(),
-						tag: $("#newTag").val()
-					});
-					$("#iceTagList").append(makeTag(true, $("#newTag").val()));
-				} else {
-					//bad stuff
-				}
-			});
+			if ($("#newTag").val().length > 0) {
+				msgBg("addNewTag", {"tag": $("#newTag").val()}, function(resp) {
+					if (resp.success === true) {
+						msgBg("addTag", {
+							galleryId: getGalleryId(),
+							tag: $("#newTag").val()
+						});
+						var newTag = makeTag(true, $("#newTag").val());
+						$("#iceTagList").append(newTag);
+						$("#iceTagList").height($("#iceTagList").height() + newTag.outerHeight(true) + "px");
+						$("#newTag").val("");
+					} else {
+						//bad stuff
+					}
+				});	
+			} else {
+				//bad stuff
+			}
 			// update view
 		}
 	});
+
 }
+
+
+// select the target node
+var target = document.querySelector('#inside > div.left.post-pad > div.post-container > div.post-images');
+// create an observer instance
+var observer = new MutationObserver(function(mutations) {
+	console.log("ok");
+	main();
+});
+
+// configuration of the observer:
+var config = { attributes: true };
+// pass in the target node, as well as the observer options
+observer.observe(target, config);
 
 function msgBg(type, jsonInfo, callback) {
 	var msg = {
@@ -83,7 +108,7 @@ function getGalleryId() {//figure out a better way to do this, then set multiple
 	var url = window.location.href;
 	return url.substring(url.indexOf("gallery/") + 8);
 }
-
+main();
 
 // perhaps every week or so delete old favorites?
 //<on every page>
