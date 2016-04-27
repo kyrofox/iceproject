@@ -6,11 +6,16 @@
     var s = document.createElement('script');
 	s.setAttribute("id", "iceHack");
     s.innerHTML = 
-	"var superHack = document.getElementById('iceHack');" +
-	"superHack.setAttribute('signed', window.Imgur.Environment.signed);" +
-	"superHack.setAttribute('userId', Imgur.Environment.auth.id);";
+		"var superHack = document.getElementById('iceHack');" +
+		"superHack.setAttribute('signed', window.Imgur.Environment.signed);" +
+		"superHack.setAttribute('userId', Imgur.Environment.auth.id);";
     th.appendChild(s);
+	msgBg("load", {"signed": $("#iceHack").attr("signed"), "userId": $("#iceHack").attr("userId")}, function(resp){
+		console.log(resp);
+	});
 })();
+
+
 
 function main() {
 	$("#iceTagMenu").remove(); //if it already exists.
@@ -56,7 +61,7 @@ function main() {
 			// check if it exists already
 			// if it doesn't, add it to allTags
 			if ($("#newTag").val().length > 0) {
-				msgBg("addNewTag", {"tag": $("#newTag").val()}, function(resp) {
+				msgBg("createTag", {"tag": $("#newTag").val()}, function(resp) {
 					if (resp.success === true) {
 						msgBg("addTag", {
 							galleryId: getGalleryId(),

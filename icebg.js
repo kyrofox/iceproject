@@ -1,5 +1,61 @@
+var currentUser;
+(function() {
+	
+	currentUser.posts = [];
+	currentUser.allTags = [];
+	
+	
+	currentUser.getPost = function(id) {
+		for(var i = 0; i < currentUser.posts.length; i++) {
+			if (currentUser.posts[i].id === id) {
+				return currentUser.posts[i];
+			}
+		}
+		return null;
+	}
+	currentUser.addPost = function(id, favorited) {
+		currentUser.posts.push({ "id": id, "favorited": favorited, tags:[] });
+	}
+	currentUser.addTag = function(id, tagNum) {
+		getPost(id).tags.push(tagNum);
+	}
+	currentUser.removeTag = function(id, tagNum)  {
+		getPost(id).tags.remove(tagNum);
+	}
+	currentUser.createTag = function(tagName) {
+			if (currentUser.allTags.indexOf(tagName) > -1 ) {
+				//tag already exists.
+				respond("fuck you");
+			} else {
+				currentUser.allTags.push(req.info.tag);
+			}
+			
+		});
+	}
+}
 
 
+var loggedIn = false;
+var tasks = [];
+
+/*var 
+
+123332: {
+	posts: [
+		{
+			galleryId: 12345
+			favorited: true,
+			tags: [0, 1, 2]
+		}
+	]
+	allTags: [
+		{"name": "one", "num": 0}
+		{"name": "two", "num": 1}
+		{"name": "three", "num": 2}
+		{"name": "four", "num": 3}
+	]
+}
+*/
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	console.log("Got message from: " + sender.tab.id);
 	console.log(request);
@@ -27,8 +83,19 @@ function handlePageReq(req, sender, sendResponse) {
 		//debugger;
 		sendResponse(resp);
 	}
-	
-	if (req.type === "addTag") { // yeah yeah i need to rename this... lazy :/
+	if (req.type === "load") {
+		if (req.info.signed && !loggedIn) {
+			loggedIn = true;
+			//check if storage contains a user for the req.info.userId
+			getOrCreateFromStorage(req.info.userId, {posts: [], allTags: []}, function(resp) {
+				currentUser.info = resp;
+			});
+			// if not, create it
+			//store the user into currentuser
+		}
+	} else if(req.type === "setUser") {
+		
+	} else if (req.type === "addTag") {
 		addTagToPost(req);
 	} else if (req.type === "removeTag") {
 		removeTagFromPost(req);
@@ -36,7 +103,7 @@ function handlePageReq(req, sender, sendResponse) {
 		getGalleryPost(req.info.galleryId, respond);
 	} else if (req.type === "getAllTags") {
 		getAllTags(respond);
-	} else if (req.type === "addNewTag") {
+	} else if (req.type === "createTag") {
 		getAllTags(function(resp) {
 			if (resp.indexOf(req.info.tag) > -1 ) {
 				//tag already exists.
@@ -86,6 +153,20 @@ function getAllTags(callback) {
 		}
 	});
 }
+
+function getOrCreateFromStorage(key, emptyObject, callback) {
+	chrome.storage.local.get(key, function(resp) {
+		if (typeof resp[key] === "undefined") {
+			//shit dont exist, create it.
+			chrome.storage.local.set({[key]: emptyObject});
+			getOrCreateFromStorage(key, emptyObject, callback);
+		} else {
+			callback(resp[key])
+		}
+	});
+}
+
+
 /*HAw0r1n: {
 	favorited: true,
 	tags: ["okay", "pls", "nty"],
@@ -94,8 +175,6 @@ function getAllTags(callback) {
 
 function getGalleryPost(galleryId, callback) {
 	chrome.storage.local.get(galleryId, function(resp) {
-		console.log("ok")
-		console.log(resp);
 		if (typeof resp[galleryId] === "undefined") {
 			//debugger;
 			//shit don't exist, create it
@@ -110,6 +189,10 @@ function getGalleryPost(galleryId, callback) {
 			callback(resp[galleryId]);
 		}
 	});
+}
+
+function getGalleryPost(galleryId, callback) {
+	for(currentUserObject)
 }
 
  
