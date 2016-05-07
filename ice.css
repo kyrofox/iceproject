@@ -3,31 +3,34 @@
 	display: block; 
 	position: absolute; 
 	background-color: #f2f2f2; 
-	z-index:10000; 
+	z-index: 10000; 
 	min-width: 200px; 
-	border-radius: 4px;
+	border-radius: 0px 4px 4px 4px;
 	padding-top: 10px;
 	padding-bottom: 10px;
+	left: 104px;
 }
 
 #iceTagMenu input[type="text"] {
 	background-color: #E8E7E6;
 	border: none;
 	color: #595959;
-	margin: 5px 15px;
+	margin: 5px 12px;
 	padding: 0px 10px;
 }
+
 .iceTagSquare {
 	background-color: #4C4C4C;
 	display: inline-block;
-	width:9px;
-	height:9px;
+	width: 9px;
+	height: 9px;
 	color: #4C4C4C;
 	border-radius: 2px;
 	font-size: 9px;
 	line-height: 110%;
 	padding-left: 1px;
 	padding-top: 1px;
+	-webkit-user-select: none;
 }
 
 .checked .iceTagSquare {
@@ -36,7 +39,6 @@
 
 .iceTag:hover {
 	background-color: #E8E7E6;
-	
 }
 
 .iceTag {

@@ -1,42 +1,68 @@
-var currentUser;
+var loggedIn = false;
+var tasks = [];
+var user = {};
+
 (function() {
 	
-	currentUser.posts = [];
-	currentUser.allTags = [];
+	user.posts = [];
+	user.allTags = [];
 	
-	
-	currentUser.getPost = function(id) {
-		for(var i = 0; i < currentUser.posts.length; i++) {
-			if (currentUser.posts[i].id === id) {
-				return currentUser.posts[i];
+	user.getPost = function(id) {
+		for(var i = 0; i < user.posts.length; i++) {
+			if (user.posts[i].id === id) {
+				return user.posts[i];
 			}
 		}
 		return null;
 	}
-	currentUser.addPost = function(id, favorited) {
-		currentUser.posts.push({ "id": id, "favorited": favorited, tags:[] });
+	user.getTag = function(tagNum) {
+		return allTags[tagNum];
+		return null;
 	}
-	currentUser.addTag = function(id, tagNum) {
-		getPost(id).tags.push(tagNum);
+	user.addPost = function(id, favorited) {
+		var post = { "id": id, "favorited": favorited, tags:[] };
+		user.posts.push(post);
+		return post;
 	}
-	currentUser.removeTag = function(id, tagNum)  {
-		getPost(id).tags.remove(tagNum);
+	user.addTagToPost = function(id, tagNum) {
+		var post = user.getPost(id);
+		if (!post) {
+			console.log("Post does not exist yet. Creating it.");
+			post = user.addPost(id, true);
+		}
+		post.tags.push(tagNum);
 	}
-	currentUser.createTag = function(tagName) {
-			if (currentUser.allTags.indexOf(tagName) > -1 ) {
-				//tag already exists.
-				respond("fuck you");
-			} else {
-				currentUser.allTags.push(req.info.tag);
+	user.removeTagFromPost = function(id, tagNum)  {
+		user.getPost(id).tags.remove(tagNum);
+	}
+	user.createTag = function(tagName) {
+		for (var i = 0; i < user.allTags.length; i++) {
+			if (user.allTags[i].name === tagName) {
+				return {success: false, msg: "Tag already exists.", tag: user.allTags[i]};
 			}
-			
-		});
-	}
-}
+		}
+		var tag = {};
+		tag.name = tagName;
+		tag.num = (function() {
+			for (var i = 0; i < 1000; i++) { //horrible code, please rewrite this please
+				var a = true;
+				for(var j = 0; j < user.allTags.length; j++) {
+					if (user.allTags[j].num === i) {
+						a = false;
+						break;
+					}
+				}
+				if (a) { //if a is still true we got a match
+					return i
+				}
+			}
+		})();
+		user.allTags.push(tag);
+		return {success: true, tag: tag}; 
+	};
+})();
 
 
-var loggedIn = false;
-var tasks = [];
 
 /*var 
 
@@ -54,17 +80,16 @@ var tasks = [];
 		{"name": "three", "num": 2}
 		{"name": "four", "num": 3}
 	]
-}
-*/
+}*/
+
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	console.log("Got message from: " + sender.tab.id);
 	console.log(request);
 	if (request["from"] === "page") {
-		handlePageReq(request, sender, sendResponse);
+		return handlePageReq(request, sender, sendResponse);
 	} else if (request["from"] === "popup") {
 		//notyetbubs
 	}
-	return true;
 });
 /* prioritize tags based on how many use them
 
@@ -84,37 +109,42 @@ function handlePageReq(req, sender, sendResponse) {
 		sendResponse(resp);
 	}
 	if (req.type === "load") {
-		if (req.info.signed && !loggedIn) {
-			loggedIn = true;
-			//check if storage contains a user for the req.info.userId
-			getOrCreateFromStorage(req.info.userId, {posts: [], allTags: []}, function(resp) {
-				currentUser.info = resp;
-			});
+		if (req.info.signed) { //current implementation will bug on sign-out or if different user logged in as.
+			if (!loggedIn) {
+				loggedIn = true;
+				//check if storage contains a user for the req.info.userId
+				
+				getOrCreateFromStorage(req.info.userId, {posts: [], allTags: []}, function(resp) {
+					user.posts = resp.posts;
+					user.allTags = resp.allTags;
+					//var  = resp[req.info.userId];
+					respond(user);
+				});
+				return true;
+			} else {
+				respond(user);
+			}
+			
 			// if not, create it
 			//store the user into currentuser
+		} else {
+			respond("notSigned");
 		}
 	} else if(req.type === "setUser") {
 		
-	} else if (req.type === "addTag") {
-		addTagToPost(req);
-	} else if (req.type === "removeTag") {
-		removeTagFromPost(req);
-	} else if (req.type === "getGalleryPost") {
-		getGalleryPost(req.info.galleryId, respond);
+	} else if (req.type === "addTagToPost") {
+		
+		
+		user.addTagToPost(req.info.id, req.info.tagNum);
+	} else if (req.type === "removeTagFromPost") {
+		user.removeTagFromPost(req.info.id, req.info.tagNum);
+	} else if (req.type === "getPost") {
+		//getGalleryPost(req.info.galleryId, respond);
+		respond(user.getPost(req.info.id));
 	} else if (req.type === "getAllTags") {
-		getAllTags(respond);
+		respond(user.allTags);
 	} else if (req.type === "createTag") {
-		getAllTags(function(resp) {
-			if (resp.indexOf(req.info.tag) > -1 ) {
-				//tag already exists.
-				respond("fuck you");
-			} else {
-				resp.push(req.info.tag);
-				chrome.storage.local.set({"all_of_teh_tags": resp});
-				respond({success: true});
-			}
-			
-		});
+		respond(user.createTag(req.info.tagName));
 	}
 }
 
@@ -192,11 +222,13 @@ function getGalleryPost(galleryId, callback) {
 }
 
 function getGalleryPost(galleryId, callback) {
-	for(currentUserObject)
+	//for(currentUserObject)
 }
 
  
-
+function saveToStorage(user) {
+	
+}
 
 Array.prototype.remove = function() {
     var what, a = arguments, L = a.length, ax;
