@@ -87,8 +87,8 @@ function favoritesPage(){
 		function makeList(currentTag) {
 			var tagSortCombo = $('<div id="tags" class="combobox sorting-text-align"></div>');
 			var list = $('<ul/>');
-			console.log(currentTag);
-			console.log(!currentTag);
+			//console.log(currentTag);
+			//console.log(!currentTag);
 			var current = $('<div class="combobox-header-current bold">current: <div class="combobox-current green">' + (currentTag ? currentTag.name :  "all")+ '</div></div>');
 			
 			if (!currentTag) { // no tag selected. this is the default scenario for page load
@@ -162,7 +162,7 @@ function galleryPage() {
 				window.setTimeout(function() {
 					refreshTags();
 					$("#iceTagMenu").fadeIn(300);
-					console.log("Fave button scrolled into view and post is faved. Displaying menu automatically.");
+					//console.log("Fave button scrolled into view and post is faved. Displaying menu automatically.");
 					hoverTimeout = window.setTimeout(function() {
 						$("#iceTagMenu").fadeOut(300);
 					}, 2000);
@@ -207,7 +207,7 @@ function galleryPage() {
 
 	$("#iceTagMenu").hover( 
 		function(e) {
-			console.log("hovered");
+			//console.log("hovered");
 			if (hoverTimeout) {
 				window.clearTimeout(hoverTimeout);
 				hoverTimeout = "";
@@ -229,7 +229,7 @@ function galleryPage() {
 	var target = document.querySelector('#inside > div.left.post-pad > div.post-container > div.post-images');
 	if (target) { // this is kinda dirty. should just check if the page is a gallery page first 
 		var observer = new MutationObserver(function(mutations) {
-			console.log("ok");
+			//console.log("ok");
 			refreshTags();
 			
 			//reset this shit and hide menu just in case
@@ -313,11 +313,11 @@ function msgBg(type, jsonInfo, callback) {
 		"type": type,
 		"info": jsonInfo
 	};
-	console.log("sending message: ");
-	console.log(msg);
+	//console.log("sending message: ");
+	//console.log(msg);
 	chrome.runtime.sendMessage(msg, function(resp) {
-		console.log("got reply: ");
-		console.log(resp);
+		//console.log("got reply: ");
+		//console.log(resp);
 		if (callback) {
 			callback(resp);
 		}
@@ -420,7 +420,7 @@ function makeEditMenu() {
 			var nameCol = $("<td></td>");
 			
 			nameCol.text(allTags[i].name);
-			console.log(nameCol);
+			//console.log(nameCol);
 			var editBtn = $('<img src="http://i.imgur.com/bugnXFI.png">');
 			var delBtn = $('<img src="http://i.imgur.com/ktWQi2y.png">');
 			var btnCol = $("<td/>");
@@ -443,7 +443,7 @@ function makeEditMenu() {
 					var renameInput = $('<input type="text">');
 					
 					renameInput.keypress(function (e) {
-						console.log(tag);
+						//console.log(tag);
 						var val = renameInput.val();
 						if (e.which == 13 && val.length !== 0) { //slight validation
 							var renamedTag = {}; //make a "new" one to be safe.
