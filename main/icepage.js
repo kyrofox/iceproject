@@ -2,7 +2,7 @@
 // lets make some fuckin code boys
 
 var fail = 0;
-var GalleryRegex = /\w+(?=[^/]*$)/gm; // i fuckin hate regex
+var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 
 (function () { //this is pretty hacky- if you can, figure out how to do this less hacky u get 10 imaginary points
     var th = document.getElementsByTagName("body")[0];
