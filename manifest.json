@@ -3,8 +3,9 @@
     "name": "Imgur Community Extension",
 	"author": "Mark Muego",
     "description": "A Chrome extension made by and for the Imgur Community.",
-    "version": "1.0.0",
-    "icons": { },
+    "version": "1.0",
+    "icons": { 
+        "128": "icon128.png" },
     "permissions": [
 		"storage"
 	],
