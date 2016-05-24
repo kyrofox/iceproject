@@ -1,14 +1,18 @@
+#iceTagMenuWrapper {
+	display:relative;
+}
+
 #iceTagMenu {
 	overflow: none; 
 	display: block; 
 	position: absolute; 
 	background-color: #f2f2f2; 
 	z-index: 10000; 
-	min-width: 200px; 
+	width: 200px; 
 	border-radius: 0px 4px 4px 4px;
 	padding-top: 10px;
 	padding-bottom: 10px;
-	left: 104px;
+	margin-left: 84px;
 }
 
 #iceTagMenu input[type="text"] {
@@ -17,6 +21,138 @@
 	color: #595959;
 	margin: 5px 12px;
 	padding: 0px 10px;
+}
+
+#iceTagEditMenu {
+	background: #212121;
+    padding: 40px 58px 20px 58px;
+	height: 400px;
+    width: 400px;
+    position:fixed;
+    top:50%;
+    left:50%;
+    margin-top:-200px; /* negative half the size of height */
+    margin-left:-200px; /* negative half the size of width */
+    letter-spacing: 0;
+	z-index: 10000;
+	cursor: auto;
+}
+#editTagsLink {
+	position: inherit;
+	z-index: 10;
+	float:right;
+}
+#iceTagEditMenu h2 {
+	font-size: 24px;
+    line-height: 24px;
+    color: #FFF;
+    margin-bottom: 7px;
+	font-weight: 400;
+	letter-spacing: 0;
+}
+
+#iceTagEditMenu > p {
+	color: #999;
+	padding: 0;
+	line-height: normal;
+	margin-bottom:30px;
+}
+
+#iceTagEditMenu .icon-x-light{
+	top: 12px;
+    right: 10px;
+}
+
+#iceTagEditMenu table {
+	width: 100%;
+}
+
+#iceTagEditMenu tr {
+	height: 30px;
+}
+
+.iceScroll {
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: 300px;
+}
+
+.db {
+	background-image: url("http://i.imgur.com/8UDu6Ps.png");
+	width: 100px;
+	height:120px;
+    margin-top: 223px;
+    margin-left: 353px;
+	position: absolute;
+	background-size: 100%;
+	background-repeat: no-repeat;
+	z-index: 9999;
+	background-position: 0px 150px;
+	-webkit-transition: background-position 1s ease-in-out;  
+    -moz-transition: background-position 1s ease-in-out;  
+    -o-transition: background-position 1s ease-in-out;  
+    transition: background-position 1s ease-in-out; 
+}
+
+#iceTagEditMenu tr:nth-child(even) {
+	background-color: #1c1c1c;
+}
+
+#iceTagEditMenu td {
+	font-size: 16px;
+	vertical-align: bottom;
+	padding: 4px;
+}
+#iceTagEditMenu td:nth-child(1) {
+	max-width: 280px;
+	width:300px;
+	text-overflow: ellipsis;
+	padding: 4px;
+	/*border-bottom: 1px solid #fff;*/
+}
+#iceTagEditMenu td:nth-child(2) {
+	max-width: 60px;
+	padding-right: 4px;
+}
+#iceTagEditMenu td:nth-child(2) img {
+	cursor: pointer;
+	opacity: .2;
+	float: right;
+	margin-left: 4px;
+	width :16px;
+	height: 16px;
+}
+#iceTagEditMenu td input[type="text"] {
+	margin:0;
+	padding:0;
+	border-radius: 0;
+	border: none;
+	box-shadow: none;
+	outline: none;
+	font-size: 16px;
+	vertical-align: bottom;
+	height: 22px;
+	background-color: inherit;
+	border-bottom: 1px solid #85BF25;
+	width: 220px;
+}
+#iceTagEditMenu tr:hover td:nth-child(2) img {
+	opacity: .8;
+}
+#iceTagEditMenu b {
+	cursor:pointer;
+}
+
+#editOverlay {
+	opacity: .95;
+	cursor: pointer;
+	background-color: #000;
+	width: 100%;
+	height: 100%;
+	z-index: 9998;
+	position: fixed;
+	top:0;
+	left:0;
 }
 
 .iceTagSquare {
@@ -52,11 +188,14 @@
 }
 
 .iceTagText {
-	padding-left: 10px;
+	margin-left: 10px;
+	width: 100px;
+	display: inline-block;
 }
 
 #iceTagList {
 	height: 0px;
 	transition: height 0.5s;
 	overflow: hidden;
+	width: 100%;
 }

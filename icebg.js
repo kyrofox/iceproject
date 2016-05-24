@@ -6,6 +6,7 @@ var user = {};
 	
 	user.posts = [];
 	user.allTags = [];
+	user.id = null;
 	
 	user.getPost = function(id) {
 		for(var i = 0; i < user.posts.length; i++) {
@@ -15,15 +16,81 @@ var user = {};
 		}
 		return null;
 	}
-	user.getTag = function(tagNum) {
-		return allTags[tagNum];
-		return null;
+	function checkIfTagExists(tag) {
+		for (var i = 0; i < user.allTags.length; i++) {
+			if (user.allTags[i].name === tag.name && user.allTags[i].num === tag.num) {
+				// k cool.
+				return true;
+			}
+		}
+		return false;
 	}
+	user.getPosts = function(tag) {
+		var resp = [];
+		if (checkIfTagExists(tag)) {
+			var tagNum = tag.num;
+			for (var i =0; i < user.posts.length; i++) {
+				if (user.posts[i].tags.indexOf(tagNum) > -1) {
+					resp.push(user.posts[i]);
+				}
+			}
+		}
+		return resp;
+	}
+	
+	user.getTag = function(tagNum) {
+		return user.allTags[tagNum];
+	}
+	user.renameTag = function(renamedTag) {
+		var success = true;
+		// check if renamed tag is the same NAME as any of the tags that already exist.
+		for (var i = 0; i < user.allTags.length; i++) {
+			if (user.allTags[i].name === renamedTag.name) {
+				if (user.allTags[i].num === renamedTag.num) {
+					//same tag! we'll let em slide for now.
+					success = true;
+				} else {
+					//what? same name, but dif num. odd.
+					success = false;
+				}
+			}
+		}
+		
+		if (!success) {
+			return "no lol";
+		} else {
+			//we should be able to expect that this num isnt fucked up. if it is, there's a major bug
+			var tag = user.getTag(renamedTag.num);
+			if (!tag) {
+				return "no lol"; // if here that's BAD.
+			} else {
+				//actually rename it now
+				tag.name = renamedTag.name;
+				user.store(); //temp
+				return tag;
+			}
+		}
+	}
+	
+	user.softDeleteTag = function(tagToBeDeleted) {
+		var tag = user.getTag(tagToBeDeleted.num);
+		if (tag.name !== tagToBeDeleted.name) {
+			return "nope.jpg";
+		} else {
+			tag.name = "[deleted](" + tag.name + ")";
+			tag.disabled = true;
+			user.store(); //temp
+			return "tag deleted";
+		}
+	}
+	
 	user.addPost = function(id, favorited) {
 		var post = { "id": id, "favorited": favorited, tags:[] };
 		user.posts.push(post);
 		return post;
+		user.store(); //temp
 	}
+	
 	user.addTagToPost = function(id, tagNum) {
 		var post = user.getPost(id);
 		if (!post) {
@@ -31,9 +98,11 @@ var user = {};
 			post = user.addPost(id, true);
 		}
 		post.tags.push(tagNum);
+		user.store();//temp
 	}
 	user.removeTagFromPost = function(id, tagNum)  {
 		user.getPost(id).tags.remove(tagNum);
+		user.store(); //temp
 	}
 	user.createTag = function(tagName) {
 		for (var i = 0; i < user.allTags.length; i++) {
@@ -58,8 +127,24 @@ var user = {};
 			}
 		})();
 		user.allTags.push(tag);
+		user.store(); //temp
 		return {success: true, tag: tag}; 
 	};
+	
+	user.getAllTags = function() {
+		var result = [];
+		for (var i = 0; i < user.allTags.length; i++) {
+			if (!user.allTags[i].disabled) {
+				result.push(user.allTags[i]);
+			} 
+		}
+		return result;
+	} 
+	
+	user.store = function() {
+		console.log("Storing everything.")
+		chrome.storage.local.set({[user.id]: {posts: user.posts, allTags: user.allTags}});
+	}
 })();
 
 
@@ -108,8 +193,23 @@ function handlePageReq(req, sender, sendResponse) {
 		//debugger;
 		sendResponse(resp);
 	}
+	
 	if (req.type === "load") {
-		if (req.info.signed) { //current implementation will bug on sign-out or if different user logged in as.
+		
+		// just in case check
+		// need to find a better way to check if user has logged out
+		if (req.info.userId !== user.id) {
+			console.log("User is not the same as stored user. Clearing info.");
+			user.posts = [];
+			user.allTags = [];
+			user.id = null;
+			loggedIn = false;
+		}
+		
+		// if signed, this means the user is logged into imgur.
+		if (req.info.signed !== "false" && req.info.userId) { //sometimes, imgur returns signed = true, but userId is undefined (if you log out).
+			// loggedin is my way of storing that they are logged in and the extension is aware of it. not sure if i should replicate
+			// this variable or just ride on the imgur one.
 			if (!loggedIn) {
 				loggedIn = true;
 				//check if storage contains a user for the req.info.userId
@@ -117,6 +217,7 @@ function handlePageReq(req, sender, sendResponse) {
 				getOrCreateFromStorage(req.info.userId, {posts: [], allTags: []}, function(resp) {
 					user.posts = resp.posts;
 					user.allTags = resp.allTags;
+					user.id = req.info.userId;
 					//var  = resp[req.info.userId];
 					respond(user);
 				});
@@ -124,29 +225,42 @@ function handlePageReq(req, sender, sendResponse) {
 			} else {
 				respond(user);
 			}
-			
+
 			// if not, create it
 			//store the user into currentuser
 		} else {
 			respond("notSigned");
+			loggedIn = false;
+			console.log("User is logged out now, clearing info.");
+			user.posts = [];
+			user.allTags = [];
+			user.id = null;
 		}
 	} else if(req.type === "setUser") {
 		
 	} else if (req.type === "addTagToPost") {
-		
-		
 		user.addTagToPost(req.info.id, req.info.tagNum);
+		respond("cool!");
 	} else if (req.type === "removeTagFromPost") {
 		user.removeTagFromPost(req.info.id, req.info.tagNum);
+		respond("cool!");
 	} else if (req.type === "getPost") {
 		//getGalleryPost(req.info.galleryId, respond);
 		respond(user.getPost(req.info.id));
 	} else if (req.type === "getAllTags") {
-		respond(user.allTags);
+		respond(user.getAllTags());
 	} else if (req.type === "createTag") {
 		respond(user.createTag(req.info.tagName));
+	} else if (req.type === "getPostsByTag") {
+		respond(user.getPosts(req.info.tag));
+	} else if (req.type === "renameTag") {
+		respond(user.renameTag(req.info.tag));
+	} else if (req.type === "deleteTag") {
+		respond(user.softDeleteTag(req.info.tag));
 	}
 }
+/*
+old stuff, might be useful
 
 function addTagToPost(req) {
 	getGalleryPost(req.info.galleryId, function(resp) {
@@ -183,7 +297,7 @@ function getAllTags(callback) {
 		}
 	});
 }
-
+*/
 function getOrCreateFromStorage(key, emptyObject, callback) {
 	chrome.storage.local.get(key, function(resp) {
 		if (typeof resp[key] === "undefined") {
@@ -196,13 +310,12 @@ function getOrCreateFromStorage(key, emptyObject, callback) {
 	});
 }
 
-
 /*HAw0r1n: {
 	favorited: true,
 	tags: ["okay", "pls", "nty"],
 	time: 123123123123213
 }*/
-
+/*
 function getGalleryPost(galleryId, callback) {
 	chrome.storage.local.get(galleryId, function(resp) {
 		if (typeof resp[galleryId] === "undefined") {
@@ -224,11 +337,8 @@ function getGalleryPost(galleryId, callback) {
 function getGalleryPost(galleryId, callback) {
 	//for(currentUserObject)
 }
+*/
 
- 
-function saveToStorage(user) {
-	
-}
 
 Array.prototype.remove = function() {
     var what, a = arguments, L = a.length, ax;
