@@ -4,7 +4,7 @@
 	"author": "Mark Muego",
     "description": "A Chrome extension made by and for the Imgur Community.",
     "version": "1.1",
-    "icons": { 
+    "icons": {
         "128": "icon128.png" },
     "permissions": [
 		"storage"
@@ -12,14 +12,14 @@
 	"content_scripts": [
         {
           "matches": ["*://*.imgur.com/*"],
-          "js": ["jquery-2.2.2.min.js", "icepage.js"],
-		   "css": ["ice.css"],
+          "js": ["js/jquery-2.2.2.min.js", "js/icepage.js"],
+		   "css": ["css/ice.css"],
 		   "run_at": "document_end"
         }
     ],
     "background": {
         "persistent": true,
-		"page": "icebg.html",
-		"js": "icebg.js"
+		"page": "html/icebg.html",
+		"js": "js/icebg.js"
     }
 }
