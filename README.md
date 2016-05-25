@@ -1,5 +1,5 @@
 # iceproject
-A browser extension created by the Imgur Community for use on imgur.
+A browser extension created by the Imgur Community for use on imgur.   
 https://chrome.google.com/webstore/detail/imgur-community-extension/diaemphodipkjighmajoojpgljpjbebd
 
 # Info
