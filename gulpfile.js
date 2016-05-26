@@ -2,6 +2,8 @@ var gulp = require('gulp');
 var minifyCss = require('gulp-minify-css');
 var zip = require('gulp-zip');
 var del = require('del');
+var uglify = require("gulp-uglify");
+var pump = require('pump');
 
 //Where we save the .zip.
 var zipFile = 'iceproject.zip';
@@ -14,11 +16,15 @@ gulp.task('assets', function() {
 });
 
 //Make js files smaller.
-//TODO check out the best thing to minify the JS.
 gulp.task('js', function(cb) {
-    gulp.src('src/js/**/*', {base: 'src'})
-    .pipe(gulp.dest('dist/'));
-});
+	pump([
+        gulp.src('src/js/**/*.js', {base: 'src'}),
+        uglify(),
+        gulp.dest('dist/')
+    ],
+    cb
+  );
+})
 
 //Minify our css.
 gulp.task('css', function() {

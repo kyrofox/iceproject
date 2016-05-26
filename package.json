@@ -1,14 +1,13 @@
 {
-    "name": "iceproject",
-    "version": "1.0.0",
-    "description": "A browser extension created by the Imgur Community for use on imgur.   \r https://chrome.google.com/webstore/detail/imgur-community-extension/diaemphodipkjighmajoojpgljpjbebd",
-    "scripts": {
-        "build":
-    },
-    "devDependencies": {
-        "del": "^2.2.0",
-        "gulp": "^3.9.1",
-        "gulp-minify-css": "^1.2.4",
-        "gulp-zip": "^3.2.0"
-    }
+  "name": "iceproject",
+  "version": "1.0.0",
+  "description": "A browser extension created by the Imgur Community for use on imgur.   \r https://chrome.google.com/webstore/detail/imgur-community-extension/diaemphodipkjighmajoojpgljpjbebd",
+  "scripts": {},
+  "devDependencies": {
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-zip": "^3.2.0",
+    "pump": "^1.0.1"
+  }
 }

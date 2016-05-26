@@ -143,7 +143,9 @@ var user = {};
 
 	user.store = function() {
 		console.log("Storing everything.")
-		chrome.storage.local.set({[user.id]: {posts: user.posts, allTags: user.allTags}});
+		var toSave = {};
+		toSave[user.id] = {posts: user.posts, allTags: user.allTags};
+		chrome.storage.local.set(toSave);
 	}
 })();
 
@@ -302,7 +304,9 @@ function getOrCreateFromStorage(key, emptyObject, callback) {
 	chrome.storage.local.get(key, function(resp) {
 		if (typeof resp[key] === "undefined") {
 			//shit dont exist, create it.
-			chrome.storage.local.set({[key]: emptyObject});
+			var toSave = {};
+			toSave[key] = emptyObject;
+			chrome.storage.local.set(toSave);
 			getOrCreateFromStorage(key, emptyObject, callback);
 		} else {
 			callback(resp[key])
