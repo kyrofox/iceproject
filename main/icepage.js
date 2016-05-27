@@ -107,8 +107,9 @@ function galleryPage() {
 	$(".favorite-image").hover( 
 		function(e) {
 			if ($(".favorite-image").hasClass("favorited")) {
+				cancelTimeout();
 				refreshTags();
-				$("#iceTagMenu").show();
+				$("#iceTagMenu").fadeIn(200);
 			}
 		}, function(e) { //make it so it sets a timeout to hide, unless the person is hovering on top of the tag menu. hide if not
 			startHideTimeout();
@@ -118,6 +119,7 @@ function galleryPage() {
 		e.stopPropagation();
 		window.setTimeout(function() {
 			if ($(".favorite-image").hasClass("favorited")) {
+				cancelTimeout();
 				refreshTags();
 				$("#iceTagMenu").fadeIn(200);
 			} else {
@@ -159,6 +161,8 @@ function galleryPage() {
 		observer.observe(target, { attributes: true });
 	}
 }
+
+
 function createImgurComboBox() {
 	//td.append(document.createTextNode('are you sure?'))
 	// menu html and styles. might still refactor css into a css class.
