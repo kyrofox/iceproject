@@ -4,14 +4,18 @@
 var fail = 0;
 var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 
-(function () { //this is pretty hacky- if you can, figure out how to do this less hacky u get 10 imaginary points
+
+// This hack was done because content scripts are isolated from global page variables. The
+// global "Imgur" variable cannot be accessed "normally", so this is how I implemented it for now.
+(function () {
     var th = document.getElementsByTagName("body")[0];
     var s = document.createElement('script');
 	s.setAttribute("id", "iceHack");
-    s.innerHTML = //this hack is because this code doesnt run until the page is fully loaded, and thats when i know for sure if Imgur.Environment info is set.
+    s.innerHTML = //this hack is because the content script is isolated from the actual page's window object.
 		"var superHack = document.getElementById('iceHack');" +
 		"superHack.setAttribute('signed', window.Imgur.Environment.signed);" +
 		"superHack.setAttribute('userId', Imgur.Environment.auth.id);";
+		
     th.appendChild(s);
 	msgBg("load", {"signed": $("#iceHack").attr("signed"), "userId": $("#iceHack").attr("userId")}, function(resp) {
 		if (resp === "notSigned") {
@@ -28,126 +32,38 @@ var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 	});
 })();
 
+
+
 // This function is run whenever the user is on http://imgur.com/account/favorites.
 function favoritesPage(){
+	var imgurSentence = $(".sentence-sorting");
+	
+	var imgurCmbx = createImgurComboBox();
+	imgurCmbx.setComboValues("all");
+	var tagCmbx = createTagComboBox(imgurCmbx);
+	
+	tagCmbx.comboBox.hide(); //hide initially so i can fade it in like a mofo
+	// append imgur sentence/combobox
+	var withTagTxt = $('<span class="middle-text sorting-text-align">with tag </span>').hide();
+	imgurSentence
+		.append($('<div class="sort-options"></div>'))
+		.append(withTagTxt)
+		.append(tagCmbx.comboBox);
+	withTagTxt.fadeIn(300);
+	tagCmbx.comboBox.fadeIn(300);
+	
+	// add editmenu link
 	var editMenuLink = $('<a id="editTagsLink">Edit tags!</a>');
 	editMenuLink.click(function(e) {
 		makeEditMenu();
 	});
 	$("#content > div.panel").prepend(editMenuLink);
-	msgBg("getAllTags", "", function(allTags) {
-		function makeListItem (display, value) {
-			var a = $('<a href="#">' + value + '</a>')
-				.css("padding", "10px 20px")
-				.css("display", "block")
-				.css("line-height", "20px");
-			var li = $('<li class="item ' + (display ? "" : "nodisplay") + '" data-value="' + value + '"></li>')
-				.css("padding", "0")
-				.append(a);
-			return li;
-		}
-		
-		var cachedFavePageArray;
-		var spinner = $('<img src="//s.imgur.com/images/loaders/ddddd1_181817/48.gif" original-title="">')
-			.css("margin-left", "auto")
-			.css("margin-right", "auto")
-			.css("display", "block")
-			.css("padding", "10px")
-		var loadWrapper = $("<div/>");
-			loadWrapper.append(spinner)
-			.css("background-color", "#181817");
-			
-		var imageList = $("#imagelist > div.posts.sub-gallery.br5.first-child");
-		function makeListListener(el, tag) {
-			el.click(function() {
-				$("#tags").remove();
-				makeList(tag);
-				if (!cachedFavePageArray) {
-					imageList.empty();
-					imageList.append(loadWrapper);
-					$("#imagelist > div:nth-child(n+3)").remove(); // this deals with if the user has scrolled down on the all page.
-					getAllFavePosts(function(allFavePagesArray) {
-						cachedFavePageArray = allFavePagesArray;
-						getFavoritesByTag(allFavePagesArray, tag, function(allFavePosts) {
-							imageList.empty();
-							imageList.append($(allFavePosts).clone()); //clone first because for some reason when appending elements
-							// they disappear from favepagearrays
-						});
-					});
-				} else {
-					imageList.empty();
-					getFavoritesByTag(cachedFavePageArray, tag, function(allFavePosts) {
-						imageList.empty();
-						imageList.append($(allFavePosts).clone());
-					});
-				}
-			});
-		}
-		var imgurSentence = $(".sentence-sorting");
-		function makeList(currentTag) {
-			var tagSortCombo = $('<div id="tags" class="combobox sorting-text-align"></div>');
-			var list = $('<ul/>');
-			//console.log(currentTag);
-			//console.log(!currentTag);
-			var current = $('<div class="combobox-header-current bold">current: <div class="combobox-current green">' + (currentTag ? currentTag.name :  "all")+ '</div></div>');
-			
-			if (!currentTag) { // no tag selected. this is the default scenario for page load
-				for (var i = 0; i < allTags.length; i++) {
-					var li = makeListItem(true, allTags[i].name);
-					makeListListener(li, allTags[i]);
-					list.append(li);
-				}
-				list.append(makeListItem(false, "all"));
-			} else {
-				for (var i = 0; i < allTags.length; i++) {
-					if (allTags[i] !== currentTag) {
-						var li = makeListItem(true, allTags[i].name);
-						makeListListener(li, allTags[i]);
-						list.append(li);
-					} else {
-						var li = makeListItem(false, allTags[i].name);
-					}
-				}
-				var allListener = makeListItem(true, "all");
-				allListener.click(function() {
-					window.location.href = "http://imgur.com/account/favorites";
-				});
-				list.append(allListener);
-			}
-			
-			var options = $('<div class="options"></div>')
-				.append(current)
-				.append(list);
-			
-			var selection = $('<div class="selection"></div>');
-			var selectionSpan = $('<span class="name">'+ (currentTag ? currentTag.name :  "all")  + '</span>')
-				.click(function(e) {
-					$("#tags").addClass("opened");
-					options.css("height: 102px");
-					e.stopPropagation();
-				});
-				
-			selection.append(selectionSpan);
-			
-			tagSortCombo
-				.append(selection)
-				.append(options)
-				.append($('<input type="hidden" name="tags" value="' + (currentTag ? currentTag.name :  "all" ) + '">'))
-				.css("text-align", "left")
-				.css("margin-left", "10px")
-			
-			imgurSentence.append(tagSortCombo);
-			imgurSentence.append($('<div class="sort-options"></div>'));
-		}
-		imgurSentence.append($('<span class="middle-text sorting-text-align">with tag </span>'));
-		makeList();
-	});
+	// run code that creates editmenu
 }
 
 // This function is run on every page that isn't the favorites page.
 function galleryPage() {
 	makeTagMenu(false);
-	
 	// this is the proest ux code btw
 	// By default, if the post is favorited, the tag menu displays on page after a second.
 	// Once the user scrolls the menu into view, it will set a timeout for 2 seconds to make the menu disappear.
@@ -157,7 +73,6 @@ function galleryPage() {
 	// or the tag menu. Once the cursor leaves either of these, the menu will close after .5 seconds.
 	var cool = function() {
 		if ($(".favorite-image").hasClass("favorited")) {
-
 			if (isScrolledIntoView("#iceTagMenu")) {//theres a slight slight edge case bug for long posts here.
 				window.setTimeout(function() {
 					refreshTags();
@@ -174,58 +89,62 @@ function galleryPage() {
 	}
 
 	var hoverTimeout = window.setTimeout(cool, 500);
+	
+	function cancelTimeout() {
+		if (hoverTimeout) {
+			window.clearTimeout(hoverTimeout);
+			hoverTimeout = "";
+		}
+	}
+	
+	function startHideTimeout() {
+		hoverTimeout = window.setTimeout(function() {
+			$("#iceTagMenu").fadeOut(300);
+		}, 500);
+	}
+	
+	//hovering over the heart will show and refresh the tag menu. hovering out of the heart will start the timeout.
 	$(".favorite-image").hover( 
 		function(e) {
 			if ($(".favorite-image").hasClass("favorited")) {
 				refreshTags();
-				$("#iceTagMenu").show()
-			}
-			if (hoverTimeout) {
-				window.clearTimeout(hoverTimeout);
-				hoverTimeout = "";
+				$("#iceTagMenu").show();
 			}
 		}, function(e) { //make it so it sets a timeout to hide, unless the person is hovering on top of the tag menu. hide if not
-			hoverTimeout = window.setTimeout(function() {
-				$("#iceTagMenu").hide();
-			}, 500);
+			startHideTimeout();
 		}
+	//clicking on the heart will show the menu if the action was a favorite, otherwise, hides menu. 200ms fadein or fadeout.
 	).click(function(e) {
 		e.stopPropagation();
 		window.setTimeout(function() {
 			if ($(".favorite-image").hasClass("favorited")) {
 				refreshTags();
-				$("#iceTagMenu").show();
+				$("#iceTagMenu").fadeIn(200);
 			} else {
 				$("#iceTagMenu").hide();
 			}
-			if (hoverTimeout) {
-				window.clearTimeout(hoverTimeout);
-				hoverTimeout = "";
-			}
 		}, 100);
 	});
-
+	
+	//hovering over the menu will cancel the timeout, unhovering the menu will start the timeout.
 	$("#iceTagMenu").hover( 
 		function(e) {
 			//console.log("hovered");
-			if (hoverTimeout) {
-				window.clearTimeout(hoverTimeout);
-				hoverTimeout = "";
-			}
+			cancelTimeout();
 		}, function(e) {
-			hoverTimeout = window.setTimeout(function() {
-				$("#iceTagMenu").fadeOut(300);
-			}, 500);
+			startHideTimeout();
 		}
+	// clicking on the menu will not propagate to document
 	).click(function(e) {
 		e.stopPropagation();
 	});
-
-	$(document).click(function() { //clicking outside of the menu will make the menu hide.
+	
+	//clicking outside of the menu will make the menu hide.
+	$(document).click(function() { 
 		$("#iceTagMenu").hide();
 	});
+
 	// end of pro ux code. seriously, like why dont people spend a lot of time on this, its kinda fun.
-	
 	var target = document.querySelector('#inside > div.left.post-pad > div.post-container > div.post-images');
 	if (target) { // this is kinda dirty. should just check if the page is a gallery page first 
 		var observer = new MutationObserver(function(mutations) {
@@ -234,16 +153,148 @@ function galleryPage() {
 			
 			//reset this shit and hide menu just in case
 			$("#iceTagMenu").hide();
-			if (hoverTimeout) {
-				window.clearTimeout(hoverTimeout);
-				hoverTimeout = "";
-			}
+			cancelTimeout();
 			hoverTimeout = window.setTimeout(cool, 500);
 		});
 		observer.observe(target, { attributes: true });
 	}
 }
+function createImgurComboBox() {
+	//td.append(document.createTextNode('are you sure?'))
+	// menu html and styles. might still refactor css into a css class.
+	var comboBox = $('<div id="tags" class="combobox sorting-text-align"></div>');
+	var selection = $('<div class="selection"></div>');
+	var selectionSpan = $('<span class="name"></span>')
+		.click(function(e) {
+			$("#tags").addClass("opened");
+			options.css("height: 102px");
+			e.stopPropagation();
+		});
+	var options = $('<div class="options"></div>');
+	var currentWrap = $('<div class="combobox-header-current bold">current: </div>');
+	var current = $('<div class="combobox-current green"></div>');
+	var list = $('<ul/>'); //list items are generated.
+	options
+		.append(currentWrap.append(current))
+		.append(list);
+	var hiddenInput = $('<input type="hidden" name="tags" value="">');
+	comboBox
+		.append(selection.append(selectionSpan))
+		.append(options)
+		.append(hiddenInput)
+		.css("text-align", "left")
+		.css("margin-left", "10px");
+	
+	//functions for manipulating combo boxes
+	
+		
+	function makeListItem (display, value) {
+		var a = $('<a href="#">' + value + '</a>')
+			.css("padding", "10px 20px")
+			.css("display", "block")
+			.css("line-height", "20px");
+		var li = $('<li class="item ' + (display ? "" : "nodisplay") + '" data-value="' + value + '"></li>')
+			.css("padding", "0")
+			.append(a);
+		return li;
+	}
+	
+	function setComboValues(value) {
+		current.text(value);
+		hiddenInput.attr("value", value );
+		selectionSpan.text(value);
+	}
 
+	// possible cases:
+	// tag selected has been renamed
+	// menu is outdated- on a seperate tab the user did stuff to tags.
+	// tag has been deleted - refresh the whole page
+	return {
+		"comboBox": comboBox,
+		"list": list,
+		"selection": selection,
+		"current": current,
+		"hiddenInput": hiddenInput,
+		"makeListItem": makeListItem,
+		"setComboValues": setComboValues
+	};
+}
+
+//creates the tag combobox
+function createTagComboBox(comboBox) {
+	var cmb = comboBox;
+	var cachedFavePageArray;
+	var imageList = $("#imagelist > div.posts.sub-gallery.br5.first-child");
+	function updateFavoritesList(tag) {
+		// refresh favorites section
+		if (!cachedFavePageArray) {
+			imageList.empty();
+			imageList.append(loadWrapper);
+			$("#imagelist > div:nth-child(n+3)").remove(); // this deals with if the user has scrolled down on the all page.
+			getAllFavePosts(function(allFavePagesArray) {
+				cachedFavePageArray = allFavePagesArray;
+				getFavoritesByTag(allFavePagesArray, tag, function(allFavePosts) {
+					imageList.empty();
+					imageList.append($(allFavePosts).clone()); //clone first because for some reason when appending elements
+					// they disappear from favepagearrays
+				});
+			});
+		} else {
+			getFavoritesByTag(cachedFavePageArray, tag, function(allFavePosts) {
+				imageList.empty();
+				imageList.append($(allFavePosts).clone());
+			});
+		}
+	}
+
+	function updateCombo (allTags, currentTag) {
+		console.log(allTags);
+		console.log(currentTag);
+		cmb.setComboValues(currentTag.name);
+		cmb.list.empty();
+		for (var i = 0; i < allTags.length; i++) {
+			var li = cmb.makeListItem(allTags[i].num !== currentTag.num, allTags[i].name);
+			if (allTags[i].num !== currentTag.num) {
+				makeListListener(li, allTags[i]);
+			}
+			cmb.list.append(li);
+		}
+		var allListener = cmb.makeListItem(true, "all");
+		allListener.click(function() {
+			window.location.href = "http://imgur.com/account/favorites";
+		});
+		cmb.list.append(allListener);
+	}
+	
+	function makeListListener(el, tag) {
+		el.click(function() {
+			msgBg("getAllTags", "", function(allTags) {
+				updateCombo(allTags, tag);
+				updateFavoritesList(tag);
+			});
+		});
+	}
+	
+	var spinner = $('<img src="//s.imgur.com/images/loaders/ddddd1_181817/48.gif" original-title="">')
+		.css("margin-left", "auto")
+		.css("margin-right", "auto")
+		.css("display", "block")
+		.css("padding", "10px");
+	var loadWrapper = $("<div/>");
+	loadWrapper.append(spinner)
+		.css("background-color", "#181817");
+	
+	//add onclicks for each selection
+	msgBg("getAllTags", "", function(allTags) {
+		for (var i = 0; i < allTags.length; i++) {
+			var li = cmb.makeListItem(true, allTags[i].name);
+			makeListListener(li, allTags[i]);
+			cmb.list.append(li);
+		}
+		cmb.list.append(cmb.makeListItem(false, "all"));
+	});
+	return cmb;
+}
 
 function getAllFavePosts(callback) {
 	function getPostsFromPage(pageNum, allFaves) {
@@ -261,7 +312,6 @@ function getAllFavePosts(callback) {
 	}
 	getPostsFromPage(0, []);
 }
-
 
 
 function getFavoritesByTag(allHtmlFavePages, tag, callback) {
@@ -284,12 +334,10 @@ function getFavoritesByTag(allHtmlFavePages, tag, callback) {
 					}
 				}
 			}
-			
 		}
 		callback(result);
 	});
 }
-
 
 /* example of what the user looks like in storage
 123332: {
@@ -370,8 +418,7 @@ function refreshTags() {
 			$("#iceTagList").append(newTagElements);
 			var height = 0;
 			for (var i = 0; i < newTagElements.length; i++) {
-				height += newTagElements[i].outerHeight(true); //todo: figure out how to not hardcode this. initial version i had had bugs.
-				//console.log();
+				height += newTagElements[i].outerHeight(true); 
 			}
 			
 			$("#iceTagList").height(height + "px");
@@ -460,7 +507,7 @@ function makeEditMenu() {
 							});
 						}
 					});
-					
+
 					renameInput.click(function(e) {
 						e.stopPropagation(); //this is for the click outside code
 					});

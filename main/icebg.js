@@ -16,6 +16,7 @@ var user = {};
 		}
 		return null;
 	}
+	
 	function checkIfTagExists(tag) {
 		for (var i = 0; i < user.allTags.length; i++) {
 			if (user.allTags[i].name === tag.name && user.allTags[i].num === tag.num) {
@@ -25,6 +26,7 @@ var user = {};
 		}
 		return false;
 	}
+	
 	user.getPosts = function(tag) {
 		var resp = [];
 		if (checkIfTagExists(tag)) {
@@ -41,6 +43,7 @@ var user = {};
 	user.getTag = function(tagNum) {
 		return user.allTags[tagNum];
 	}
+	
 	user.renameTag = function(renamedTag) {
 		var success = true;
 		// check if renamed tag is the same NAME as any of the tags that already exist.
@@ -100,10 +103,12 @@ var user = {};
 		post.tags.push(tagNum);
 		user.store();//temp
 	}
+	
 	user.removeTagFromPost = function(id, tagNum)  {
 		user.getPost(id).tags.remove(tagNum);
 		user.store(); //temp
 	}
+	
 	user.createTag = function(tagName) {
 		for (var i = 0; i < user.allTags.length; i++) {
 			if (user.allTags[i].name === tagName) {
@@ -145,6 +150,7 @@ var user = {};
 		console.log("Storing everything.")
 		chrome.storage.local.set({[user.id]: {posts: user.posts, allTags: user.allTags}});
 	}
+	
 })();
 
 
