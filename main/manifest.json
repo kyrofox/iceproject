@@ -12,7 +12,7 @@
 	"content_scripts": [
         {
           "matches": ["*://*.imgur.com/*"],
-          "js": ["jquery-2.2.2.min.js", "icepage.js"],
+          "js": ["js/jquery-2.2.2.min.js", "js/pageGlobal.js"],
 		   "css": ["ice.css"],
 		   "run_at": "document_end"
         }
@@ -20,6 +20,6 @@
     "background": {
         "persistent": true,
 		"page": "icebg.html",
-		"js": "icebg.js"
+		"js": "js/icebg.js"
     }
 }
