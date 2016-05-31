@@ -637,7 +637,7 @@ function makeTagMenu(includeTags) {
     var iceTagInput = document.createElement("input");
     iceTagInput.id = "newTag";
     iceTagInput.type = "text";
-    iceTagInput.setAttribute("placeholder", "new tag?");
+    iceTagInput.setAttribute("placeholder", "new tag? :P");
 
     iceTagInput.onkeydown = function (e) {
         if (e.which == 13) {
@@ -657,7 +657,7 @@ function makeTagMenu(includeTags) {
                                 newTag.setAttribute("placeholder", "thanks :)");
                                 fail = 0;
                                 window.setTimeout(function () {
-                                    document.getElementById("newTag").setAttribute("placeholder", "new tag?");
+                                    document.getElementById("newTag").setAttribute("placeholder", "new tag? :P");
                                 }, 500);
                             }
                         });
@@ -690,7 +690,7 @@ function makeTagMenu(includeTags) {
                 fail++;
 
                 window.setTimeout(function () {
-                    document.getElementById("newTag").setAttribute("placeholder", "new tag?");
+                    document.getElementById("newTag").setAttribute("placeholder", "new tag? :P");
                 }, 500);
             }
         }
