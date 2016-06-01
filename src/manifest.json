@@ -5,7 +5,7 @@
     "description": "A Chrome extension made by and for the Imgur Community.",
     "version": "1.1",
     "icons": { 
-        "128": "icon128.png" },
+        "128": "img/icon128.png" },
     "permissions": [
 		"storage",
 		"tabs",
@@ -16,7 +16,7 @@
 		{
 			"matches": ["*://*.imgur.com/*", "*://imgur.com/*"],
 			"js": ["js/jquery-2.2.2.min.js", "js/pageGlobal.js"],
-			"css": ["ice.css"],
+			"css": ["css/ice.css"],
 			"run_at": "document_end"
 		}
 	],
