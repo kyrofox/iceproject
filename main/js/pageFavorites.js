@@ -1,4 +1,6 @@
 // This function is run whenever the user is on http://imgur.com/account/favorites.
+
+console.log("favorites script running");
 function favoritesPage(){
 	var imgurSentence = $(".sentence-sorting");
 	
@@ -23,7 +25,7 @@ function favoritesPage(){
 	});
 	$("#content > div.panel").prepend(editMenuLink);
 	// run code that creates editmenu
-}
+};
 
 function createImgurComboBox() {
 	//td.append(document.createTextNode('are you sure?'))
@@ -176,7 +178,6 @@ function getAllFavePosts(callback) {
 	}
 	getPostsFromPage(0, []);
 }
-
 
 function getFavoritesByTag(allHtmlFavePages, tag, callback) {
 	msgBg("getPostsByTag", {"tag": tag}, function(allPosts) {
@@ -511,3 +512,4 @@ function makeTagMenu(includeTags) {
 }
 
 
+favoritesPage();

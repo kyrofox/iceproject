@@ -1,6 +1,6 @@
 // Hey ya fuckin weirdos its ya boy shotty steve
 // lets make some fuckin code boys
-
+console.log("global script running");
 var fail = 0;
 var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 
@@ -15,21 +15,15 @@ var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 		"var superHack = document.getElementById('iceHack');" +
 		"superHack.setAttribute('signed', window.Imgur.Environment.signed);" +
 		"superHack.setAttribute('userId', Imgur.Environment.auth.id);";
-		
+
     th.appendChild(s);
-	msgBg("load", {"signed": $("#iceHack").attr("signed"), "userId": $("#iceHack").attr("userId")}, function(resp) {
-		if (resp === "notSigned") {
-			//idk lol
-			//console.log("Not signed in.")
-		} else {
-			var test = window.location.href.match(GalleryRegex);
-			if (window.location.href.indexOf("imgur.com/account/favorites") > -1 && (test === null || test[0] === "favorites")) { //make sure its not a favorites/<id> page.
-				favoritesPage();
-			} else {
-				galleryPage();
-			}
-		}
-	});
+	var test = window.location.href.match(GalleryRegex);
+	if (window.location.href.indexOf("imgur.com/account/favorites") > -1 && (test === null || test[0] === "favorites")) { //make sure its not a favorites/<id> page.
+		var page = "favorites";
+	} else {
+		var page = "gallery";
+	}
+	msgBg("load", { "signed": $("#iceHack").attr("signed"), "userId": $("#iceHack").attr("userId"), "page": page});
 })();
 
 /* example of what the user looks like in storage

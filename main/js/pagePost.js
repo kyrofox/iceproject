@@ -1,6 +1,8 @@
 // Hey ya fuckin weirdos its ya boy shotty steve
 // lets make some fuckin code boys
 
+console.log("post script running")
+
 var fail = 0;
 var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 
@@ -186,6 +188,58 @@ function makeTagMenu(includeTags) {
 	iceTagMenu.hide();
 }
 
+function makeTag(initialValue, tagName, tagNum) {
+	var newTag = $('<span class="iceTag ' + (initialValue ? "checked" : "") + '"><span class="iceTagSquare">✔</span> <span class="iceTagText">' + tagName + '</span></span>' );
+	newTag.click(function() {
+		if (newTag.hasClass("checked")) {
+			//send message to background to remove tag
+			newTag.removeClass("checked");
+			msgBg("removeTagFromPost", { "id": getGalleryId(), "tagNum": tagNum}); //ideally, we should not req tagName, but instead make sure that the tagList is always updated, so tagnum stays g
+		} else {
+			newTag.addClass("checked");
+			msgBg("addTagToPost", { "id": getGalleryId(), "tagNum": tagNum });
+			//send message to background to add tag
+		}
+	});
+	return newTag;
+}
+
+function refreshTags() {
+	// hide menu
+	// get tags from BG
+	msgBg("getAllTags", "", function(resp) {
+		var allTags = resp;
+		// get post's tags
+		msgBg("getPost", {"id": getGalleryId()}, function(resp) {
+			var post = resp;
+			
+			// for each tag in alltags, go through and create each one. if any of them are on the post, check them.
+			var newTagElements = [];
+			for(var i = 0; i < allTags.length; i++) {
+				var checked = false;
+				if (post) {
+					for (var j = 0; j < post.tags.length; j++) {
+						if (post.tags[j] === allTags[i].num) {
+							checked = true;
+						}
+					}
+				}
+				newTagElements.push(makeTag(checked, allTags[i].name, allTags[i].num));
+			}
+			// clear tags
+			$("#iceTagList").empty(); 
+
+			// add to dom
+			$("#iceTagList").append(newTagElements);
+			var height = 0;
+			for (var i = 0; i < newTagElements.length; i++) {
+				height += newTagElements[i].outerHeight(true); 
+			}
+			
+			$("#iceTagList").height(height + "px");
+		});
+	});
+}
 
 function getGalleryId() {
 	var url = window.location.href;
@@ -196,5 +250,7 @@ function getGalleryId() {
 		return url.substring(url.indexOf("gallery/") + 8).replace("?", "");
 	}
 }
+
+galleryPage();
 
 

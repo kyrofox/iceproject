@@ -7,19 +7,20 @@
     "icons": { 
         "128": "icon128.png" },
     "permissions": [
-		"storage"
+		"storage",
+		"tabs",
+		"activeTab",
+		"*://*.imgur.com/*", "*://imgur.com/*"
 	],
 	"content_scripts": [
-        {
-          "matches": ["*://*.imgur.com/*"],
-          "js": ["js/jquery-2.2.2.min.js", "js/pageGlobal.js"],
-		   "css": ["ice.css"],
-		   "run_at": "document_end"
-        }
-    ],
+		{
+			"matches": ["*://*.imgur.com/*", "*://imgur.com/*"],
+			"js": ["js/jquery-2.2.2.min.js", "js/pageGlobal.js"],
+			"css": ["ice.css"],
+			"run_at": "document_end"
+		}
+	],
     "background": {
-        "persistent": true,
-		"page": "icebg.html",
-		"js": "js/icebg.js"
+		"scripts": ["js/icebg.js"]
     }
 }
