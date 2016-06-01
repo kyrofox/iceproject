@@ -109,36 +109,45 @@ function isScrolledIntoView(elem)
 }
 
 function makeTagMenu(includeTags) {
-	var iceTagMenuWrapper = 
-		$(	'<div id="iceTagMenuWrapper"></div>');
-	var iceTagMenu = 
-		$(	'<div id="iceTagMenu">' +
-				'<div id="iceTagList"></div>' +
-			'</div>');
-			
+	var iceTagMenuWrapper = document.createElement("div");
+	iceTagMenuWrapper.id = "iceTagMenuWrapper";
+
+	var iceTagMenu = document.createElement("div");
+	iceTagMenu.id = "iceTagMenu";
+
+	var iceTagList = document.createElement("div");
+	iceTagList.id = "iceTagList";
+
+	iceTagMenu.appendChild(iceTagList);
+
 	if (includeTags) {
 		refreshTags();
 	}
-	
-	var iceTagInput = $('<input id="newTag" type="text" placeholder= "new tag? :P">');
-	iceTagInput.keypress(function (e) {
+
+	var iceTagInput = document.createElement("input");
+	iceTagInput.id = "newTag";
+	iceTagInput.type = "text";
+	iceTagInput.setAttribute("placeholder", "new tag? :P");
+
+	iceTagInput.onkeydown = function (e) {
 		if (e.which == 13) {
 			// check if it exists already
 			// if it doesn't, add it to allTags
-			if ($("#newTag").val().length > 0) { //basic validation
-				msgBg("createTag", {"tagName": $("#newTag").val()}, function(resp) {
+			var newTag = document.getElementById("newTag");
+			if (newTag.value.length > 0) { //basic validation
+				msgBg("createTag", {"tagName": newTag.value}, function (resp) {
 					if (resp.success === true) {
 						msgBg("addTagToPost", {
 							"id": getGalleryId(),
 							"tagNum": resp.tag.num
-						}, function(resp) {
+						}, function (resp) {
 							refreshTags();
-							$("#newTag").val("");
+							newTag.value = "";
 							if (fail > 0) {
-								$("#newTag").attr("placeholder", "thanks :)");
+								newTag.setAttribute("placeholder", "thanks :)");
 								fail = 0;
-								window.setTimeout(function() {
-									$("#newTag").attr("placeholder", "new tag? :P");
+								window.setTimeout(function () {
+									document.getElementById("newTag").setAttribute("placeholder", "new tag? :P");
 								}, 500);
 							}
 						});
@@ -147,45 +156,40 @@ function makeTagMenu(includeTags) {
 							msgBg("addTagToPost", {
 								"id": getGalleryId(),
 								"tagNum": resp.tag.num
-							}, function(resp) {
+							}, function (resp) {
 								refreshTags();
-								$("#newTag").val("");
+								newTag.value = "";
 							});
 						}
 						//bad stuff
 					}
 				});
 			} else {
-				whale = fail % 7;
-				
-				if (whale === 0) {
-					$("#newTag").attr("placeholder", "what");
-				} else if (whale === 1) {
-					$("#newTag").attr("placeholder", "no, stop");
-				} else if (whale === 2) {
-					$("#newTag").attr("placeholder", "seriously");
-				} else if (whale === 3) {
-					$("#newTag").attr("placeholder", "why are you doing this");
-				} else if (whale === 4) {
-					$("#newTag").attr("placeholder", "just fucking type something");
-				} else if (whale === 5) {
-					$("#newTag").attr("placeholder", "please");
-				} else if (whale === 6) {
-					$("#newTag").attr("placeholder", "wow");
-				}
+				var messages = [
+					"what",
+					"no, stop",
+					"seriously",
+					"why are you doing this",
+					"just type something",
+					"please",
+					"wow"
+				];
+
+				document.getElementById("newTag").setAttribute("placeholder", messages[fail % messages.length]);
+
 				fail++;
-				
-				window.setTimeout(function() {
-					$("#newTag").attr("placeholder", "new tag? :P");
+
+				window.setTimeout(function () {
+					document.getElementById("newTag").setAttribute("placeholder", "new tag? :P");
 				}, 500);
 			}
 		}
-	});
+	};
 
-	iceTagMenu.append(iceTagInput);
-	$('#under-image').append(iceTagMenuWrapper);
-	iceTagMenuWrapper.append(iceTagMenu);
-	iceTagMenu.hide();
+	iceTagMenu.appendChild(iceTagInput);
+	iceTagMenu.style.display = "none";
+	iceTagMenuWrapper.appendChild(iceTagMenu);
+	document.getElementById("under-image").appendChild(iceTagMenuWrapper);
 }
 
 function makeTag(initialValue, tagName, tagNum) {

@@ -606,83 +606,87 @@ function isScrolledIntoView(elem)
 }
 
 function makeTagMenu(includeTags) {
-	var iceTagMenuWrapper = 
-		$(	'<div id="iceTagMenuWrapper"></div>');
-	var iceTagMenu = 
-		$(	'<div id="iceTagMenu">' +
-				'<div id="iceTagList"></div>' +
-			'</div>');
-			
-	if (includeTags) {
-		refreshTags();
-	}
-	
-	var iceTagInput = $('<input id="newTag" type="text" placeholder= "new tag? :P">');
-	iceTagInput.keypress(function (e) {
-		if (e.which == 13) {
-			// check if it exists already
-			// if it doesn't, add it to allTags
-			if ($("#newTag").val().length > 0) { //basic validation
-				msgBg("createTag", {"tagName": $("#newTag").val()}, function(resp) {
-					if (resp.success === true) {
-						msgBg("addTagToPost", {
-							"id": getGalleryId(),
-							"tagNum": resp.tag.num
-						}, function(resp) {
-							refreshTags();
-							$("#newTag").val("");
-							if (fail > 0) {
-								$("#newTag").attr("placeholder", "thanks :)");
-								fail = 0;
-								window.setTimeout(function() {
-									$("#newTag").attr("placeholder", "new tag? :P");
-								}, 500);
-							}
-						});
-					} else {
-						if (resp.msg === "Tag already exists.") {
-							msgBg("addTagToPost", {
-								"id": getGalleryId(),
-								"tagNum": resp.tag.num
-							}, function(resp) {
-								refreshTags();
-								$("#newTag").val("");
-							});
-						}
-						//bad stuff
-					}
-				});
-			} else {
-				whale = fail % 7;
-				
-				if (whale === 0) {
-					$("#newTag").attr("placeholder", "what");
-				} else if (whale === 1) {
-					$("#newTag").attr("placeholder", "no, stop");
-				} else if (whale === 2) {
-					$("#newTag").attr("placeholder", "seriously");
-				} else if (whale === 3) {
-					$("#newTag").attr("placeholder", "why are you doing this");
-				} else if (whale === 4) {
-					$("#newTag").attr("placeholder", "just fucking type something");
-				} else if (whale === 5) {
-					$("#newTag").attr("placeholder", "please");
-				} else if (whale === 6) {
-					$("#newTag").attr("placeholder", "wow");
-				}
-				fail++;
-				
-				window.setTimeout(function() {
-					$("#newTag").attr("placeholder", "new tag? :P");
-				}, 500);
-			}
-		}
-	});
+    var iceTagMenuWrapper = document.createElement("div");
+    iceTagMenuWrapper.id = "iceTagMenuWrapper";
 
-	iceTagMenu.append(iceTagInput);
-	$('#under-image').append(iceTagMenuWrapper);
-	iceTagMenuWrapper.append(iceTagMenu);
-	iceTagMenu.hide();
+    var iceTagMenu = document.createElement("div");
+    iceTagMenu.id = "iceTagMenu";
+
+    var iceTagList = document.createElement("div");
+    iceTagList.id = "iceTagList";
+
+    iceTagMenu.appendChild(iceTagList);
+
+    if (includeTags) {
+        refreshTags();
+    }
+
+    var iceTagInput = document.createElement("input");
+    iceTagInput.id = "newTag";
+    iceTagInput.type = "text";
+    iceTagInput.setAttribute("placeholder", "new tag? :P");
+
+    iceTagInput.onkeydown = function (e) {
+        if (e.which == 13) {
+            // check if it exists already
+            // if it doesn't, add it to allTags
+            var newTag = document.getElementById("newTag");
+            if (newTag.value.length > 0) { //basic validation
+                msgBg("createTag", {"tagName": newTag.value}, function (resp) {
+                    if (resp.success === true) {
+                        msgBg("addTagToPost", {
+                            "id": getGalleryId(),
+                            "tagNum": resp.tag.num
+                        }, function (resp) {
+                            refreshTags();
+                            newTag.value = "";
+                            if (fail > 0) {
+                                newTag.setAttribute("placeholder", "thanks :)");
+                                fail = 0;
+                                window.setTimeout(function () {
+                                    document.getElementById("newTag").setAttribute("placeholder", "new tag? :P");
+                                }, 500);
+                            }
+                        });
+                    } else {
+                        if (resp.msg === "Tag already exists.") {
+                            msgBg("addTagToPost", {
+                                "id": getGalleryId(),
+                                "tagNum": resp.tag.num
+                            }, function (resp) {
+                                refreshTags();
+                                newTag.value = "";
+                            });
+                        }
+                        //bad stuff
+                    }
+                });
+            } else {
+                var messages = [
+                    "what",
+                    "no, stop",
+                    "seriously",
+                    "why are you doing this",
+                    "just type something",
+                    "please",
+                    "wow"
+                ];
+
+                document.getElementById("newTag").setAttribute("placeholder", messages[fail % messages.length]);
+
+                fail++;
+
+                window.setTimeout(function () {
+                    document.getElementById("newTag").setAttribute("placeholder", "new tag? :P");
+                }, 500);
+            }
+        }
+    };
+
+    iceTagMenu.appendChild(iceTagInput);
+    iceTagMenu.style.display = "none";
+    iceTagMenuWrapper.appendChild(iceTagMenu);
+    document.getElementById("under-image").appendChild(iceTagMenuWrapper);
 }
 
 
