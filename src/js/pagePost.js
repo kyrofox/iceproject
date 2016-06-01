@@ -241,6 +241,101 @@ function refreshTags() {
 	});
 }
 
+	var parent  = $("#captions > form > div.summary.right");
+	var fakeCharCount = $('<div class="counterz"></div>');
+	parent.append(fakeCharCount);
+	
+	//var commentCounter = $('<div class="counterz"></div>');
+	//parent.append(commentCounter);
+	//commentCounter.text("/" + commCount);
+
+	
+	
+	var target = $('#captions > form > div.summary.right > div.counter');
+	target.hide();
+	var commentSubmitBtn = $("#submit-comment");
+	var commentTxb = $("#captions > form > textarea");
+	var comments = [];
+	var hacking = false;
+	var observer = new MutationObserver(function(mutations) {
+	  mutations.forEach(function(mutation) {
+		console.log(mutation);
+		var currentCharCount = 140 - parseInt(target.text(), 10);
+		console.log(currentCharCount);
+		var commCount = Math.floor(currentCharCount / 140) + 1;
+		fakeCharCount.text(140 - currentCharCount % 140);
+		//var count = mutation.addedNodes.data;
+		//(1/X)
+		if (currentCharCount > 0 && currentCharCount < 500) {
+			commentSubmitBtn.prop("disabled", false); //
+		} else {
+			commentSubmitBtn.prop("disabled", true); //
+		}
+		if (currentCharCount > 140) {
+			hacking = true;
+			var futureComments = formatIntoComments(commentTxb.val());
+			console.log(futureComments);
+			fakeCharCount.text(135 - futureComments[futureComments.length - 1].length + 1 + "/" + futureComments.length);
+		}
+	  });
+	});
+		
+	observer.observe(target[0], { childList:true });
+
+	commentSubmitBtn.click(function(e) {
+		e.stopPropagation();
+		if (hacking) {
+
+			
+		}
+	});
+	var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'";
+	//can expect string's length to be > 140
+	
+	var test1 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH";
+	var test2 = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy textsssssssssssssssssssssssssssssssssssssssssssssssssss ";
+	var test3 = "They really are fake, the sparks and stuff he does would surely kill him in certain videos, he always has a charged capacitor to create the effects shown in his videos. Its basic electrical engineering and he actually explains this in some.of his pain tolerance videos."
+	function formatIntoComments(longString) {
+		var result = [];
+		
+		//var first = longString.substring(0, 135);
+		var temp = 0;
+		while(longString && temp < 100) {
+			temp++;
+			longString = longString.trim();
+			var spaceInd = longString.substring(126, 136).lastIndexOf(" ");
+			
+			var chunkEndIndex = spaceInd > -1 ? spaceInd + 126 : 135;
+			
+			if (longString.length < 135) {
+				result.push(longString);
+				longString = "";
+			} else if (chunkEndIndex <= 136) {
+				var chunk = longString.substring(0, chunkEndIndex);
+				console.log(chunk.length);
+				result.push(chunk.trim());
+				longString = longString.substring(chunkEndIndex);
+				//console.log(longString);
+				
+				
+			}
+		}
+		console.log(result.length);
+		return result;
+		
+		
+		/*
+		if (chars.indexOf(longString.substring(134, 135)) > -1) {
+			if (chars.indexOf(longString.substring(135, 136)) > -1
+			var comm1 = first + "-" + "(1/2)"; 
+				
+		} else {
+			var comm1 = first + "(1/2)";
+		}*/
+	}
+
+	
+
 function getGalleryId() {
 	var url = window.location.href;
 	var matches = url.match(GalleryRegex);
@@ -250,6 +345,8 @@ function getGalleryId() {
 		return url.substring(url.indexOf("gallery/") + 8).replace("?", "");
 	}
 }
+
+
 
 galleryPage();
 

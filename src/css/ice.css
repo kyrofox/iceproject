@@ -267,3 +267,17 @@
 	-o-transition: background-position 1s ease-in-out;
 	transition: background-position 1s ease-in-out;
 }
+
+
+
+
+	
+	.counterz {
+		position: absolute;
+		top: 30px;
+		right: 8px;
+		font-size: 14px;
+		color: #888;
+		font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+	}
+	
