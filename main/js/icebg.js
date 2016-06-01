@@ -1,7 +1,23 @@
 var loggedIn = false;
 var tasks = [];
 var user = {};
+/*ex of user obj in page storage
 
+123332: {
+	posts: [
+		{
+			galleryId: 12345
+			favorited: true,
+			tags: [0, 1, 2]
+		}
+	]
+	allTags: [
+		{"name": "one", "num": 0}
+		{"name": "two", "num": 1}
+		{"name": "three", "num": 2}
+		{"name": "four", "num": 3}
+	]
+}*/
 (function() {
 	
 	user.posts = [];
@@ -155,23 +171,7 @@ var user = {};
 
 
 
-/*var 
 
-123332: {
-	posts: [
-		{
-			galleryId: 12345
-			favorited: true,
-			tags: [0, 1, 2]
-		}
-	]
-	allTags: [
-		{"name": "one", "num": 0}
-		{"name": "two", "num": 1}
-		{"name": "three", "num": 2}
-		{"name": "four", "num": 3}
-	]
-}*/
 
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	console.log("Got message from: " + sender.tab.id);
@@ -225,23 +225,32 @@ function handlePageReq(req, sender, sendResponse) {
 					user.allTags = resp.allTags;
 					user.id = req.info.userId;
 					//var  = resp[req.info.userId];
-					respond(user);
 				});
-				return true;
-			} else {
-				respond(user);
 			}
 
 			// if not, create it
 			//store the user into currentuser
 		} else {
-			respond("notSigned");
 			loggedIn = false;
 			console.log("User is logged out now, clearing info.");
 			user.posts = [];
 			user.allTags = [];
 			user.id = null;
 		}
+		console.log(req.info.page);
+		if (req.info.page === "favorites") {
+			//run gallery
+			chrome.tabs.executeScript(sender.tab.id,{
+				file: "/js/pageFavorites.js"
+			});
+		} else {
+			//run other
+			chrome.tabs.executeScript(sender.tab.id,{
+				file: "/js/pagePost.js"
+			});
+		}
+		
+		
 	} else if(req.type === "setUser") {
 		
 	} else if (req.type === "addTagToPost") {
@@ -265,45 +274,7 @@ function handlePageReq(req, sender, sendResponse) {
 		respond(user.softDeleteTag(req.info.tag));
 	}
 }
-/*
-old stuff, might be useful
 
-function addTagToPost(req) {
-	getGalleryPost(req.info.galleryId, function(resp) {
-		resp.tags.push(req.info.tag);
-		chrome.storage.local.set({[req.info.galleryId]: {
-			favorited: resp.favorited,
-			tags: resp.tags,
-			time: new Date().getTime()
-		}});
-	});
-}
-
-function removeTagFromPost(req) {
-	getGalleryPost(req.info.galleryId, function(resp) {
-		resp.tags.remove(req.info.tag);
-		chrome.storage.local.set(
-		{[req.info.galleryId]: {
-			favorited: resp.favorited,
-			tags: resp.tags,
-			time: new Date().getTime()
-		}});
-	});
-}
-
-function getAllTags(callback) {
-	chrome.storage.local.get("all_of_teh_tags", function(resp) {
-		if (typeof resp["all_of_teh_tags"] === "undefined") {
-			//debugger;
-			//shit don't exist, create it
-			chrome.storage.local.set({"all_of_teh_tags": []});
-			getAllTags(callback);
-		} else {
-			callback(resp["all_of_teh_tags"]);
-		}
-	});
-}
-*/
 function getOrCreateFromStorage(key, emptyObject, callback) {
 	chrome.storage.local.get(key, function(resp) {
 		if (typeof resp[key] === "undefined") {
@@ -315,36 +286,6 @@ function getOrCreateFromStorage(key, emptyObject, callback) {
 		}
 	});
 }
-
-/*HAw0r1n: {
-	favorited: true,
-	tags: ["okay", "pls", "nty"],
-	time: 123123123123213
-}*/
-/*
-function getGalleryPost(galleryId, callback) {
-	chrome.storage.local.get(galleryId, function(resp) {
-		if (typeof resp[galleryId] === "undefined") {
-			//debugger;
-			//shit don't exist, create it
-			chrome.storage.local.set({[galleryId]: {
-				favorited: null,
-				tags: [],
-				time: new Date().getTime()
-			}});
-			getGalleryPost(galleryId, callback);
-			
-		} else {
-			callback(resp[galleryId]);
-		}
-	});
-}
-
-function getGalleryPost(galleryId, callback) {
-	//for(currentUserObject)
-}
-*/
-
 
 Array.prototype.remove = function() {
     var what, a = arguments, L = a.length, ax;
