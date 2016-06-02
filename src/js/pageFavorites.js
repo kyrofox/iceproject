@@ -1,40 +1,6 @@
-// Hey ya fuckin weirdos its ya boy shotty steve
-// lets make some fuckin code boys
-
-var fail = 0;
-var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
-
-
-// This hack was done because content scripts are isolated from global page variables. The
-// global "Imgur" variable cannot be accessed "normally", so this is how I implemented it for now.
-(function () {
-    var th = document.getElementsByTagName("body")[0];
-    var s = document.createElement('script');
-	s.setAttribute("id", "iceHack");
-    s.innerHTML = //this hack is because the content script is isolated from the actual page's window object.
-		"var superHack = document.getElementById('iceHack');" +
-		"superHack.setAttribute('signed', window.Imgur.Environment.signed);" +
-		"superHack.setAttribute('userId', Imgur.Environment.auth.id);";
-		
-    th.appendChild(s);
-	msgBg("load", {"signed": $("#iceHack").attr("signed"), "userId": $("#iceHack").attr("userId")}, function(resp) {
-		if (resp === "notSigned") {
-			//idk lol
-			//console.log("Not signed in.")
-		} else {
-			var test = window.location.href.match(GalleryRegex);
-			if (window.location.href.indexOf("imgur.com/account/favorites") > -1 && (test === null || test[0] === "favorites")) { //make sure its not a favorites/<id> page.
-				favoritesPage();
-			} else {
-				galleryPage();
-			}
-		}
-	});
-})();
-
-
-
 // This function is run whenever the user is on http://imgur.com/account/favorites.
+
+console.log("favorites script running");
 function favoritesPage(){
 	var imgurSentence = $(".sentence-sorting");
 	
@@ -59,98 +25,7 @@ function favoritesPage(){
 	});
 	$("#content > div.panel").prepend(editMenuLink);
 	// run code that creates editmenu
-}
-
-// This function is run on every page that isn't the favorites page.
-function galleryPage() {
-	//try to create the tag menu.
-	makeTagMenu(false);
-	// this is the proest ux code btw
-	// By default, if the post is favorited, the tag menu displays on page after a second.
-	// Once the user scrolls the menu into view, it will set a timeout for 2 seconds to make the menu disappear.
-	// If the post is not favorited, the tag menu will not display.
-	// If the favorite button is hovered over and the post is favorited, the tag menu will display.
-	// Once the cursor leaves the favorite button, the menu will close after .5 seconds, unless the cursor hovers over the favorite button
-	// or the tag menu. Once the cursor leaves either of these, the menu will close after .5 seconds.
-	var cool = function() {
-		if ($(".favorite-image").hasClass("favorited")) {
-			if (isScrolledIntoView("#iceTagMenu")) {//theres a slight slight edge case bug for long posts here.
-				window.setTimeout(function() {
-					refreshTags();
-					$("#iceTagMenu").fadeIn(300);
-					//console.log("Fave button scrolled into view and post is faved. Displaying menu automatically.");
-					hoverTimeout = window.setTimeout(function() {
-						$("#iceTagMenu").fadeOut(300);
-					}, 2000);
-				}, 500);
-			} else {
-				window.setTimeout(cool, 500);
-			}
-		}
-	}
-
-	var hoverTimeout = window.setTimeout(cool, 1000);
-	
-	function cancelTimeout() {
-		if (hoverTimeout) {
-			window.clearTimeout(hoverTimeout);
-			hoverTimeout = "";
-		}
-	}
-	
-	function startHideTimeout() {
-		hoverTimeout = window.setTimeout(function() {
-			$("#iceTagMenu").fadeOut(300);
-		}, 500);
-	}
-	
-	//hovering over the heart will show and refresh the tag menu. hovering out of the heart will start the timeout.
-	$(".favorite-image").hover(
-		function(e) {
-			if ($(".favorite-image").hasClass("favorited")) {
-				cancelTimeout();
-				refreshTags();
-				$("#iceTagMenu").fadeIn(200);
-			}
-		}, function(e) { //make it so it sets a timeout to hide, unless the person is hovering on top of the tag menu. hide if not
-			startHideTimeout();
-		}
-	//clicking on the heart will show the menu if the action was a favorite, otherwise, hides menu. 200ms fadein or fadeout.
-	).click(function(e) {
-		e.stopPropagation();
-		window.setTimeout(function() {
-			if ($(".favorite-image").hasClass("favorited")) {
-				cancelTimeout();
-				refreshTags();
-				$("#iceTagMenu").fadeIn(200);
-			} else {
-				$("#iceTagMenu").hide();
-			}
-		}, 100);
-	});
-	
-	//hovering over the menu will cancel the timeout, unhovering the menu will start the timeout.
-	$("#iceTagMenu").hover(cancelTimeout, startHideTimeout).click(function(e) { e.stopPropagation(); });
-		
-	//clicking outside of the menu will make the menu hide.
-	$(document).click(function() { $("#iceTagMenu").hide(); });
-
-	// end of pro ux code. seriously, like why dont people spend a lot of time on this, its kinda fun.
-	var target = document.querySelector('#inside > div.left.post-pad > div.post-container > div.post-images');
-	if (target) { // this is kinda dirty. should just check if the page is a gallery page first 
-		var observer = new MutationObserver(function(mutations) {
-			//console.log("ok");
-			refreshTags();
-			
-			//reset this shit and hide menu just in case
-			$("#iceTagMenu").hide();
-			cancelTimeout();
-			hoverTimeout = window.setTimeout(cool, 500);
-		});
-		observer.observe(target, { attributes: true });
-	}
-}
-
+};
 
 function createImgurComboBox() {
 	//td.append(document.createTextNode('are you sure?'))
@@ -179,8 +54,6 @@ function createImgurComboBox() {
 		.css("margin-left", "10px");
 	
 	//functions for manipulating combo boxes
-	
-		
 	function makeListItem (display, value) {
 		var a = $('<a href="#">' + value + '</a>')
 			.css("padding", "10px 20px")
@@ -306,7 +179,6 @@ function getAllFavePosts(callback) {
 	getPostsFromPage(0, []);
 }
 
-
 function getFavoritesByTag(allHtmlFavePages, tag, callback) {
 	msgBg("getPostsByTag", {"tag": tag}, function(allPosts) {
 		//first, get all posts on page. for now, assume this is first 50. that way we can skip the first get call to favorites page.
@@ -331,40 +203,6 @@ function getFavoritesByTag(allHtmlFavePages, tag, callback) {
 		callback(result);
 	});
 }
-
-/* example of what the user looks like in storage
-123332: {
-	posts: [
-		{
-			galleryId: 12345
-			favorited: true,
-			tags: [0, 1, 2]
-		}
-	]
-	allTags: [
-		{"name": "one", "num": 0}
-		{"name": "two", "num": 1}
-		{"name": "three", "num": 2}
-		{"name": "four", "num": 3}
-	]
-}*/
-function msgBg(type, jsonInfo, callback) {
-	var msg = {
-		"from": "page",
-		"type": type,
-		"info": jsonInfo
-	};
-	//console.log("sending message: ");
-	//console.log(msg);
-	chrome.runtime.sendMessage(msg, function(resp) {
-		//console.log("got reply: ");
-		//console.log(resp);
-		if (callback) {
-			callback(resp);
-		}
-	});
-}
-
 
 function makeTag(initialValue, tagName, tagNum) {
 	var newTag = $('<span class="iceTag ' + (initialValue ? "checked" : "") + '"><span class="iceTagSquare">✔</span> <span class="iceTagText">' + tagName + '</span></span>' );
@@ -593,111 +431,85 @@ function makeEditMenu() {
 	});
 }
 
-//thanks, stack overflow!
-function isScrolledIntoView(elem)
-{
-    var $elem = $(elem);
-    var $window = $(window);
-    var docViewTop = $window.scrollTop();
-    var docViewBottom = docViewTop + $window.height();
-    var elemTop = $elem.offset().top;
-    var elemBottom = elemTop + $elem.height();
-    return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
-}
-
 function makeTagMenu(includeTags) {
-    var iceTagMenuWrapper = document.createElement("div");
-    iceTagMenuWrapper.id = "iceTagMenuWrapper";
-
-    var iceTagMenu = document.createElement("div");
-    iceTagMenu.id = "iceTagMenu";
-
-    var iceTagList = document.createElement("div");
-    iceTagList.id = "iceTagList";
-
-    iceTagMenu.appendChild(iceTagList);
-
-    if (includeTags) {
-        refreshTags();
-    }
-
-    var iceTagInput = document.createElement("input");
-    iceTagInput.id = "newTag";
-    iceTagInput.type = "text";
-    iceTagInput.setAttribute("placeholder", "new tag? :P");
-
-    iceTagInput.onkeydown = function (e) {
-        if (e.which == 13) {
-            // check if it exists already
-            // if it doesn't, add it to allTags
-            var newTag = document.getElementById("newTag");
-            if (newTag.value.length > 0) { //basic validation
-                msgBg("createTag", {"tagName": newTag.value}, function (resp) {
-                    if (resp.success === true) {
-                        msgBg("addTagToPost", {
-                            "id": getGalleryId(),
-                            "tagNum": resp.tag.num
-                        }, function (resp) {
-                            refreshTags();
-                            newTag.value = "";
-                            if (fail > 0) {
-                                newTag.setAttribute("placeholder", "thanks :)");
-                                fail = 0;
-                                window.setTimeout(function () {
-                                    document.getElementById("newTag").setAttribute("placeholder", "new tag? :P");
-                                }, 500);
-                            }
-                        });
-                    } else {
-                        if (resp.msg === "Tag already exists.") {
-                            msgBg("addTagToPost", {
-                                "id": getGalleryId(),
-                                "tagNum": resp.tag.num
-                            }, function (resp) {
-                                refreshTags();
-                                newTag.value = "";
-                            });
-                        }
-                        //bad stuff
-                    }
-                });
-            } else {
-                var messages = [
-                    "what",
-                    "no, stop",
-                    "seriously",
-                    "why are you doing this",
-                    "just type something",
-                    "please",
-                    "wow"
-                ];
-
-                document.getElementById("newTag").setAttribute("placeholder", messages[fail % messages.length]);
-
-                fail++;
-
-                window.setTimeout(function () {
-                    document.getElementById("newTag").setAttribute("placeholder", "new tag? :P");
-                }, 500);
-            }
-        }
-    };
-
-    iceTagMenu.appendChild(iceTagInput);
-    iceTagMenu.style.display = "none";
-    iceTagMenuWrapper.appendChild(iceTagMenu);
-    document.getElementById("under-image").appendChild(iceTagMenuWrapper);
-}
-
-
-function getGalleryId() {
-	var url = window.location.href;
-	var matches = url.match(GalleryRegex);
-	if (matches) {
-		return matches[0];
-	} else {
-		return url.substring(url.indexOf("gallery/") + 8).replace("?", "");
+	var iceTagMenuWrapper = 
+		$(	'<div id="iceTagMenuWrapper"></div>');
+	var iceTagMenu = 
+		$(	'<div id="iceTagMenu">' +
+				'<div id="iceTagList"></div>' +
+			'</div>');
+			
+	if (includeTags) {
+		refreshTags();
 	}
+	
+	var iceTagInput = $('<input id="newTag" type="text" placeholder= "new tag? :P">');
+	iceTagInput.keypress(function (e) {
+		if (e.which == 13) {
+			// check if it exists already
+			// if it doesn't, add it to allTags
+			if ($("#newTag").val().length > 0) { //basic validation
+				msgBg("createTag", {"tagName": $("#newTag").val()}, function(resp) {
+					if (resp.success === true) {
+						msgBg("addTagToPost", {
+							"id": getGalleryId(),
+							"tagNum": resp.tag.num
+						}, function(resp) {
+							refreshTags();
+							$("#newTag").val("");
+							if (fail > 0) {
+								$("#newTag").attr("placeholder", "thanks :)");
+								fail = 0;
+								window.setTimeout(function() {
+									$("#newTag").attr("placeholder", "new tag? :P");
+								}, 500);
+							}
+						});
+					} else {
+						if (resp.msg === "Tag already exists.") {
+							msgBg("addTagToPost", {
+								"id": getGalleryId(),
+								"tagNum": resp.tag.num
+							}, function(resp) {
+								refreshTags();
+								$("#newTag").val("");
+							});
+						}
+						//bad stuff
+					}
+				});
+			} else {
+				whale = fail % 7;
+				
+				if (whale === 0) {
+					$("#newTag").attr("placeholder", "what");
+				} else if (whale === 1) {
+					$("#newTag").attr("placeholder", "no, stop");
+				} else if (whale === 2) {
+					$("#newTag").attr("placeholder", "seriously");
+				} else if (whale === 3) {
+					$("#newTag").attr("placeholder", "why are you doing this");
+				} else if (whale === 4) {
+					$("#newTag").attr("placeholder", "just fucking type something");
+				} else if (whale === 5) {
+					$("#newTag").attr("placeholder", "please");
+				} else if (whale === 6) {
+					$("#newTag").attr("placeholder", "wow");
+				}
+				fail++;
+				
+				window.setTimeout(function() {
+					$("#newTag").attr("placeholder", "new tag? :P");
+				}, 500);
+			}
+		}
+	});
+
+	iceTagMenu.append(iceTagInput);
+	$('#under-image').append(iceTagMenuWrapper);
+	iceTagMenuWrapper.append(iceTagMenu);
+	iceTagMenu.hide();
 }
 
 
+favoritesPage();
