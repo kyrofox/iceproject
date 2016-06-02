@@ -2,7 +2,6 @@ var loggedIn = false;
 var tasks = [];
 var user = {};
 /*ex of user obj in page storage
-
 123332: {
 	posts: [
 		{
@@ -19,11 +18,11 @@ var user = {};
 	]
 }*/
 (function() {
-	
+
 	user.posts = [];
 	user.allTags = [];
 	user.id = null;
-	
+
 	user.getPost = function(id) {
 		for(var i = 0; i < user.posts.length; i++) {
 			if (user.posts[i].id === id) {
@@ -32,7 +31,7 @@ var user = {};
 		}
 		return null;
 	}
-	
+
 	function checkIfTagExists(tag) {
 		for (var i = 0; i < user.allTags.length; i++) {
 			if (user.allTags[i].name === tag.name && user.allTags[i].num === tag.num) {
@@ -42,7 +41,7 @@ var user = {};
 		}
 		return false;
 	}
-	
+
 	user.getPosts = function(tag) {
 		var resp = [];
 		if (checkIfTagExists(tag)) {
@@ -55,11 +54,11 @@ var user = {};
 		}
 		return resp;
 	}
-	
+
 	user.getTag = function(tagNum) {
 		return user.allTags[tagNum];
 	}
-	
+
 	user.renameTag = function(renamedTag) {
 		var success = true;
 		// check if renamed tag is the same NAME as any of the tags that already exist.
@@ -74,7 +73,7 @@ var user = {};
 				}
 			}
 		}
-		
+
 		if (!success) {
 			return "no lol";
 		} else {
@@ -90,7 +89,7 @@ var user = {};
 			}
 		}
 	}
-	
+
 	user.softDeleteTag = function(tagToBeDeleted) {
 		var tag = user.getTag(tagToBeDeleted.num);
 		if (tag.name !== tagToBeDeleted.name) {
@@ -102,14 +101,14 @@ var user = {};
 			return "tag deleted";
 		}
 	}
-	
+
 	user.addPost = function(id, favorited) {
 		var post = { "id": id, "favorited": favorited, tags:[] };
 		user.posts.push(post);
 		return post;
 		user.store(); //temp
 	}
-	
+
 	user.addTagToPost = function(id, tagNum) {
 		var post = user.getPost(id);
 		if (!post) {
@@ -119,12 +118,12 @@ var user = {};
 		post.tags.push(tagNum);
 		user.store();//temp
 	}
-	
+
 	user.removeTagFromPost = function(id, tagNum)  {
 		user.getPost(id).tags.remove(tagNum);
 		user.store(); //temp
 	}
-	
+
 	user.createTag = function(tagName) {
 		for (var i = 0; i < user.allTags.length; i++) {
 			if (user.allTags[i].name === tagName) {
@@ -149,24 +148,26 @@ var user = {};
 		})();
 		user.allTags.push(tag);
 		user.store(); //temp
-		return {success: true, tag: tag}; 
+		return {success: true, tag: tag};
 	};
-	
+
 	user.getAllTags = function() {
 		var result = [];
 		for (var i = 0; i < user.allTags.length; i++) {
 			if (!user.allTags[i].disabled) {
 				result.push(user.allTags[i]);
-			} 
+			}
 		}
 		return result;
-	} 
-	
+	}
+
 	user.store = function() {
 		console.log("Storing everything.")
-		chrome.storage.local.set({[user.id]: {posts: user.posts, allTags: user.allTags}});
+		var toStore = {};
+		toStore[user.id] = {posts: user.posts, allTags: user.allTags};
+		chrome.storage.local.set(toStore);
 	}
-	
+
 })();
 
 
@@ -183,7 +184,6 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	}
 });
 /* prioritize tags based on how many use them
-
 		/*
 	console.log(sender.tab ?
 				"from a content script:" + sender.tab.url :
@@ -199,9 +199,9 @@ function handlePageReq(req, sender, sendResponse) {
 		//debugger;
 		sendResponse(resp);
 	}
-	
+
 	if (req.type === "load") {
-		
+
 		// just in case check
 		// need to find a better way to check if user has logged out
 		if (req.info.userId !== user.id) {
@@ -211,7 +211,7 @@ function handlePageReq(req, sender, sendResponse) {
 			user.id = null;
 			loggedIn = false;
 		}
-		
+
 		// if signed, this means the user is logged into imgur.
 		if (req.info.signed !== "false" && req.info.userId) { //sometimes, imgur returns signed = true, but userId is undefined (if you log out).
 			// loggedin is my way of storing that they are logged in and the extension is aware of it. not sure if i should replicate
@@ -219,7 +219,7 @@ function handlePageReq(req, sender, sendResponse) {
 			if (!loggedIn) {
 				loggedIn = true;
 				//check if storage contains a user for the req.info.userId
-				
+
 				getOrCreateFromStorage(req.info.userId, {posts: [], allTags: []}, function(resp) {
 					user.posts = resp.posts;
 					user.allTags = resp.allTags;
@@ -249,10 +249,10 @@ function handlePageReq(req, sender, sendResponse) {
 				file: "/js/pagePost.js"
 			});
 		}
-		
-		
+
+
 	} else if(req.type === "setUser") {
-		
+
 	} else if (req.type === "addTagToPost") {
 		user.addTagToPost(req.info.id, req.info.tagNum);
 		respond("cool!");
@@ -279,7 +279,9 @@ function getOrCreateFromStorage(key, emptyObject, callback) {
 	chrome.storage.local.get(key, function(resp) {
 		if (typeof resp[key] === "undefined") {
 			//shit dont exist, create it.
-			chrome.storage.local.set({[key]: emptyObject});
+			var toStore = {};
+			toStore[key] = emptyObject
+			chrome.storage.local.set(toStore);
 			getOrCreateFromStorage(key, emptyObject, callback);
 		} else {
 			callback(resp[key])
