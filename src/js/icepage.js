@@ -701,3 +701,144 @@ function getGalleryId() {
 }
 
 
+function devtro() {
+
+    function devs() {
+        var dev = ["kyrofox", "MalwareExe"];
+        for (var i = 0; i < dev.length; i++) {
+            if (window.location.href.toString().indexOf(dev[i]) >= 0) {
+                console.log(true);
+                return true;
+            } else {
+                console.log(false);
+            }
+        }
+    }
+
+    if (window.location.href.toString().indexOf("imgur.com/user") >= 0 && devs()) {
+        var noto = $('.notoriety-title');
+        noto.append($("<h2 style='color:#85BF25'><img src='http://i.share.pho.to/d7a53620_c.png' width='15' hight='15'>     Icegur Developer</h2>"));
+        //.css("color: green");
+        var tro = $("#mycarousel");
+        tro.append($("<li><img src='http://i.share.pho.to/c832035f_c.png' class='title' title='<h2>Icegur Developer</h2>Developed The icegur extension for Imgur.'></li>"));
+    }
+}
+unction urlAdd(addition) {
+// insert addition to the end of url in empty quotes
+// if statement prevents looping calls from affecting the url
+    if (window.location.href.indexOf(addition) === -1) {
+        window.location.href = window.location.href + addition;
+    }
+}
+function mapMenu() {
+    function isText() {
+        if (document.activeElement.nodeName == "TEXTAREA") {
+            console.log();
+            return (true);
+        }
+    }
+
+    var kkeys = [];
+    $(document).keydown(function (e) {
+            kkeys.push(e.keyCode);
+            if (kkeys[0].toString().indexOf("72") << 0) {
+                kkeys.length = 0;
+            } else if (!isText()) {
+                var esc = true;
+                kkeys = [];
+                var editMenu = $("<div/>");
+                var closeButton = $('<button type="button" id="cboxClose" class="icon-x-light icon" style="display: block;"></button>');
+                kkeys.length = 0;
+                console.log(kkeys.length)
+                editMenu.attr("id", "iceTagEditMenu")
+                    .append(closeButton)
+                    .append($("<h2 align='center'>Imgur Shortcuts</h2>"))
+                msgBg("getAllTags", "", function () {
+                    var editOverlay = $('<div id="editOverlay"></div>');
+                    var stable = $("<table>")
+
+                    function sc(a, b, c, d) {
+                        stable.append($("<tr>" +
+                            "<td style='width:25%;'>" + a + "</td>" +
+                            "<td style='width:40%;'>" + b + "</td>" +
+                            "<td style='width:15%;'>" + c + "</td>" +
+                            "<td style='width:30%;'>" + d + "</td>"));
+                    }
+
+                    sc("Ctrl + F9", "Auto-Browse", "Esc", "Exit Menus");
+                    sc("Shift + Tab", "Comments", "` or ~", "Upload");
+                    sc("S", "Image Stats", "▲▼", "Scroll");
+                    sc("◄/►", "Next/ Previous", "[", "View replies");
+                    sc("Enter", "Zoom", "]", "Close Replies");
+                    sc("+/-", "Up/ Down vote", "9", "Expand Album");
+                    sc("0 or Insert", "Favorite", "H", "Shortcuts");
+                    stable.append($("</table>"));
+                    editMenu.append(stable);
+                    editOverlay.click(function () {
+                        editOverlay.fadeOut(300);
+                    });
+                    closeButton.click(function () {
+                        editOverlay.fadeOut(300);
+                    });
+                    $(document).keyup(function (e) {
+                        if (e.which == 27 && esc === true) {
+                            editOverlay.fadeOut(300);
+                        }
+                    });
+
+                    $("body").append(editOverlay);
+                    $(editOverlay).append(editMenu);
+                });
+
+            }
+        }
+    );
+
+}
+
+function konamiCode() {
+
+    var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";
+    $(document).keydown(function (e) {
+        kkeys.push(e.keyCode);
+
+        if (kkeys.toString().indexOf(konami) >= 0) {
+            $(document).unbind('keydown', arguments.callee);
+            kkeys = [];
+            var x = document.createElement("STYLE");
+            var t = document.createTextNode("body {font: 12px Comic Sans MS;}");
+            x.appendChild(t);
+            document.head.appendChild(x);
+
+            var editMenu = $("<div/>");
+            var closeButton = $('<button type="button" id="cboxClose" class="icon-x-light icon" style="display: block;"></button>');
+
+            editMenu.attr("id", "iceTagEditMenu")
+                .append(closeButton)
+                .append($("<h2 align='center'>FUCK YEAH EASTER EGGS!</h2>"))
+                .append($("<h3 align='center'>I hope you like comic sans</h3>"));
+
+            msgBg("getAllTags", "", function () {
+                var editOverlay = $('<div id="editOverlay"></div>');
+                var dickButt = $('<img src="http://s33.postimg.org/jy9qb0gzz/forkonami.png" align="middle">')
+                    .css("width", "100%");
+                editMenu.append(dickButt);
+
+                editOverlay.click(function () {
+                    editOverlay.fadeOut(300);
+                });
+                closeButton.click(function () {
+                    editOverlay.fadeOut(300);
+                });
+                $(document).keyup(function (e) {
+                    if (e.which == 27) {
+                        editOverlay.fadeOut(300);
+                    }
+                });
+                $("body").append(editOverlay);
+                $(editOverlay).append(editMenu);
+            });
+            $("body").addClass("konami");
+        }
+    });
+}
