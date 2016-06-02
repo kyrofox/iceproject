@@ -266,7 +266,7 @@ galleryPage();
 
 function devtro() {
     function devs() {
-        var dev = ["kyrofox", "MalwareExe"];
+        var dev = ["kyrofox", "MalwareExe", "Willsr71"];
         for (var i = 0; i < dev.length; i++) {
             if (window.location.href.toString().toLowerCase().indexOf(dev[i].toLowerCase()) >= 0) {
                 return true;
