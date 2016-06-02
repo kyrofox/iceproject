@@ -11,6 +11,7 @@ function galleryPage() {
 	//try to create the tag menu.
 	mapMenu();
 	konamiCode();
+	devtro();
 	makeTagMenu(false);
 	// this is the proest ux code btw
 	// By default, if the post is favorited, the tag menu displays on page after a second.
@@ -261,7 +262,6 @@ galleryPage();
 
 
 function devtro() {
-
     function devs() {
         var dev = ["kyrofox", "MalwareExe"];
         for (var i = 0; i < dev.length; i++) {
@@ -291,6 +291,7 @@ function urlAdd(addition) {
     }
 }
 function mapMenu() {
+	// hold down h for 5 seconds :/ -k
     function isText() {
         if (document.activeElement.nodeName == "TEXTAREA") {
             console.log();
@@ -313,7 +314,7 @@ function mapMenu() {
                 editMenu.attr("id", "iceTagEditMenu")
                     .append(closeButton)
                     .append($("<h2 align='center'>Imgur Shortcuts</h2>"))
-                msgBg("getAllTags", "", function () {
+
                     var editOverlay = $('<div id="editOverlay"></div>');
                     var stable = $("<table>")
 
@@ -345,10 +346,10 @@ function mapMenu() {
                             editOverlay.fadeOut(300);
                         }
                     });
-
+	
                     $("body").append(editOverlay);
                     $(editOverlay).append(editMenu);
-                });
+
 
             }
         }
@@ -356,10 +357,23 @@ function mapMenu() {
 
 }
 
+
+// seperate creating egg menu logic into seperate function for readability
+function createEasterEggMenu() {
+	
+}
+
 function konamiCode() {
 
     var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";
-    $(document).keydown(function (e) {
+	var konamiaasdasda = [38,38,40,40,37,39,37,39,66,65]; //use this approach instead 
+	//have a variable set to be the index of the key you're looking for in the konami array  -k
+	// always checking in runtime
+	// not storing any keys pressed
+	// up up down down left right "up" left right b a (should it pass or nah?)
+    $(document).keydown(function (e) { 
+	// repeated keydown on document, maybe find a way to implement
+	// a seperate keydown function (see stuff function) -k
         kkeys.push(e.keyCode);
 
         if (kkeys.toString().indexOf(konami) >= 0) {
@@ -378,7 +392,8 @@ function konamiCode() {
                 .append($("<h2 align='center'>FUCK YEAH EASTER EGGS!</h2>"))
                 .append($("<h3 align='center'>I hope you like comic sans</h3>"));
 
-            msgBg("getAllTags", "", function () {
+            msgBg("getAllTags", "", function () { // refactor this so its not jank (into createEasterEggMenu) -kyro
+				// add stopPropagation
                 var editOverlay = $('<div id="editOverlay"></div>');
                 var dickButt = $('<img src="http://s33.postimg.org/jy9qb0gzz/forkonami.png" align="middle">')
                     .css("width", "100%");
@@ -402,3 +417,14 @@ function konamiCode() {
         }
     });
 }
+
+function stuff() { //from kyro
+	$(document).keydown(function (e) {
+		//put functions that run each keydown here
+		//konami
+		//
+	});
+}
+
+
+
