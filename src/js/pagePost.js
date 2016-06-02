@@ -282,7 +282,8 @@ function devtro() {
         tro.append($("<li><img src='http://i.share.pho.to/c832035f_c.png' class='title' title='<h2>Icegur Developer</h2>Developed The icegur extension for Imgur.'></li>"));
     }
 }
-unction urlAdd(addition) {
+
+function urlAdd(addition) {
 // insert addition to the end of url in empty quotes
 // if statement prevents looping calls from affecting the url
     if (window.location.href.indexOf(addition) === -1) {
