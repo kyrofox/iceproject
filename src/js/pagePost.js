@@ -266,7 +266,7 @@ galleryPage();
 
 function devtro() {
     function devs() {
-        var dev = ["kyrofox", "MalwareExe", "Willsr71","hedgehog1029", "lazy784"];
+        var dev = ["kyrofox", "MalwareExe", "Willsr71","hedgehog1029", "lazy784", "HardTruth"];
         for (var i = 0; i < dev.length; i++) {
             if (window.location.href.toString().toLowerCase().indexOf(dev[i].toLowerCase()) >= 0) {
                 return true;
