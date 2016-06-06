@@ -9,7 +9,7 @@ var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 // This function is run on every page that isn't the favorites page.
 function galleryPage() {
     createEasterEggMenu();
-    makeTagMenu();
+    makeTagMenu(false);
     // this is the proest ux code btw
     // By default, if the post is favorited, the tag menu displays on page after a second.
     // Once the user scrolls the menu into view, it will set a timeout for 2 seconds to make the menu disappear.
