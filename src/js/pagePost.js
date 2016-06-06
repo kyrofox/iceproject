@@ -8,7 +8,10 @@ var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 
 // This function is run on every page that isn't the favorites page.
 function galleryPage() {
-    createEasterEggMenu();
+    //try to create the tag menu.
+    mapMenu();
+    konamiCode();
+    devtro();
     makeTagMenu(false);
     // this is the proest ux code btw
     // By default, if the post is favorited, the tag menu displays on page after a second.
@@ -263,7 +266,7 @@ galleryPage();
 
 function devtro() {
     function devs() {
-        var dev = ["kyrofox", "MalwareExe", "Willsr71","hedgehog1029", "lazy784", "HardTruth","Rhodian", "cavejay"];
+        var dev = ["kyrofox", "MalwareExe", "Willsr71"];
         for (var i = 0; i < dev.length; i++) {
             if (window.location.href.toString().toLowerCase().indexOf(dev[i].toLowerCase()) >= 0) {
                 return true;
@@ -299,23 +302,24 @@ function urlAdd(addition) {
 function mapMenu() {
     // hold down h for 5 seconds :/ -k
     function isText() {
-        if (document.activeElement.nodeName == "TEXTAREA") {
-            console.log();
+        if($("input,textarea").is(":focus")){
             return (true);
         }
     }
 
-    $(document).keydown(function (e) {
+    $(document).keyup(function (e) {
+
 
         if (!isText() && checker(e.keyCode, 72)) {
+
             var esc = true;
             var texts = $("<div/>");
             var closeButton = $('<button type="button" id="cboxClose" class="icon-x-light icon" style="display: block;"></button>');
-            texts.attr("id", "iceTagEditMenu")
+            texts.attr("id", "iceTagMapMenu")
                 .append(closeButton)
-                .append($("<h2 align='center'>Imgur Shortcuts</h2>"))
+                .append($("<h1 align='center' style='color: #85BF25'>Imgur Shortcuts</h1>"))
 
-            var overlay = $('<div id="mapOverlay"></div>');
+            var overlay = $('<div></div>');
             var stable = $("<table>")
 
             function sc(a, b, c, d) {
@@ -339,8 +343,8 @@ function mapMenu() {
 
             $("body").append(overlay);
             $(overlay).append(texts);
-
-            overlay.click(function () {
+            e.stopPropagation();
+            $(document).click(function () {
                 overlay.fadeOut(200);
             });
             closeButton.click(function () {
@@ -354,6 +358,12 @@ function mapMenu() {
 
         }
     });
+}
+
+
+// seperate creating egg menu logic into seperate function for readability
+function createEasterEggMenu() {
+
 }
 
 function konamiCode() {
@@ -410,7 +420,7 @@ function konamiCode() {
     });
 }
 
-function checker(i, e) { //from kyro
+function checker(i, e) {
     console.log(e == i);
     if (e == i) {
         return true;
@@ -419,14 +429,3 @@ function checker(i, e) { //from kyro
     }
 
 }
-
-/*
-calls some ui functions
- */
-function createEasterEggMenu() {
-    //urlAdd();
-    devtro();
-    konamiCode();
-    mapMenu();
-}
-
