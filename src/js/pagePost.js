@@ -8,11 +8,8 @@ var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 
 // This function is run on every page that isn't the favorites page.
 function galleryPage() {
-    //try to create the tag menu.
-    mapMenu();
-    konamiCode();
-    devtro();
-    makeTagMenu(false);
+    createEasterEggMenu();
+    makeTagMenu();
     // this is the proest ux code btw
     // By default, if the post is favorited, the tag menu displays on page after a second.
     // Once the user scrolls the menu into view, it will set a timeout for 2 seconds to make the menu disappear.
@@ -359,12 +356,6 @@ function mapMenu() {
     });
 }
 
-
-// seperate creating egg menu logic into seperate function for readability
-function createEasterEggMenu() {
-
-}
-
 function konamiCode() {
     var konamis = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
     var count = 0;
@@ -428,3 +419,14 @@ function checker(i, e) { //from kyro
     }
 
 }
+
+/*
+calls some ui functions
+ */
+function createEasterEggMenu() {
+    //urlAdd();
+    devtro();
+    konamiCode();
+    mapMenu();
+}
+
