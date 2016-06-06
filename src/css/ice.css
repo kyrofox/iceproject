@@ -152,6 +152,22 @@
 	cursor: auto;
 }
 
+#iceTagMapMenu {
+	background: #212121;
+	opacity: 0.9;
+	padding: 40px 58px 20px 58px;
+	height: 200px;
+	width: 400px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin-top: -200px;
+	margin-left: -200px;
+	letter-spacing: 0;
+	z-index: 100;
+	cursor: auto;
+}
+
 #iceTagEditMenu h2 {
 	font-size: 24px;
 	line-height: 24px;
@@ -174,6 +190,10 @@
 	right: 10px;
 }
 
+#iceTagMapMenu .icon-x-light {
+	top: 12px;
+	right: 10px;
+}
 #iceTagEditMenu table {
 	width: 100%;
 }

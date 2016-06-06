@@ -8,10 +8,7 @@ var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 
 // This function is run on every page that isn't the favorites page.
 function galleryPage() {
-    //try to create the tag menu.
-    mapMenu();
-    konamiCode();
-    devtro();
+    createEasterEggMenu();
     makeTagMenu(false);
     // this is the proest ux code btw
     // By default, if the post is favorited, the tag menu displays on page after a second.
@@ -266,7 +263,7 @@ galleryPage();
 
 function devtro() {
     function devs() {
-        var dev = ["kyrofox", "MalwareExe", "Willsr71"];
+        var dev = ["kyrofox", "MalwareExe", "Willsr71","hedgehog1029", "lazy784", "HardTruth","Rhodian", "cavejay"];
         for (var i = 0; i < dev.length; i++) {
             if (window.location.href.toString().toLowerCase().indexOf(dev[i].toLowerCase()) >= 0) {
                 return true;
@@ -319,7 +316,7 @@ function mapMenu() {
                 .append(closeButton)
                 .append($("<h1 align='center' style='color: #85BF25'>Imgur Shortcuts</h1>"))
 
-            var overlay = $('<div></div>');
+            var overlay = $('<div id="mapOverlay"></div>');
             var stable = $("<table>")
 
             function sc(a, b, c, d) {
@@ -364,6 +361,11 @@ function mapMenu() {
 // seperate creating egg menu logic into seperate function for readability
 function createEasterEggMenu() {
 
+       //urlAdd();
+       devtro();
+       konamiCode();
+       mapMenu();
+       
 }
 
 function konamiCode() {
