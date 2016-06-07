@@ -2,7 +2,7 @@
 // lets make some fuckin code boys
 
 console.log("post script running")
-
+var hkey = "72";
 var fail = 0;
 var GalleryRegex = /\w+(?=[^/]*$)/gm; // i hate regex
 
@@ -263,7 +263,7 @@ galleryPage();
 
 function devtro() {
     function devs() {
-        var dev = ["kyrofox", "MalwareExe", "Willsr71","hedgehog1029", "lazy784", "HardTruth","Rhodian", "cavejay"];
+        var dev = ["kyrofox", "MalwareExe", "Willsr71", "hedgehog1029", "lazy784", "HardTruth", "Rhodian", "cavejay"];
         for (var i = 0; i < dev.length; i++) {
             if (window.location.href.toString().toLowerCase().indexOf(dev[i].toLowerCase()) >= 0) {
                 return true;
@@ -296,29 +296,25 @@ function urlAdd(addition) {
         window.location.href = window.location.href + addition;
     }
 }
-function mapMenu() {
+function mapMenu(setKey) {
     // hold down h for 5 seconds :/ -k
     function isText() {
-        if($("input,textarea").is(":focus")){
+        if ($("input,textarea").is(":focus")) {
             return (true);
         }
     }
 
-    $(document).keyup(function (e) {
-
-
-        if (!isText() && checker(e.keyCode, 72)) {
-
-            var esc = true;
+    $(document).keydown(function (e) {
+        if (!isText() && checker(e.keyCode, setKey)) {
             var texts = $("<div/>");
             var closeButton = $('<button type="button" id="cboxClose" class="icon-x-light icon" style="display: block;"></button>');
             texts.attr("id", "iceTagMapMenu")
                 .append(closeButton)
                 .append($("<h1 align='center' style='color: #85BF25'>Imgur Shortcuts</h1>"))
+                .append($('<p><br></p>'));
 
             var overlay = $('<div id="mapOverlay"></div>');
             var stable = $("<table>")
-
             function sc(a, b, c, d) {
                 stable.append($("<tr>" +
                     "<td style='width:25%;'>" + a + "</td>" +
@@ -340,15 +336,16 @@ function mapMenu() {
 
             $("body").append(overlay);
             $(overlay).append(texts);
-            e.stopPropagation();
+            $(document).on('keydown');
             $(document).click(function () {
                 overlay.fadeOut(200);
+
             });
             closeButton.click(function () {
                 overlay.fadeOut(200);
             });
             $(document).keyup(function (e) {
-                if (e.which == 27 && esc === true) {
+                if (e.which == 27) {
                     overlay.fadeOut(200);
                 }
             });
@@ -361,11 +358,11 @@ function mapMenu() {
 // seperate creating egg menu logic into seperate function for readability
 function createEasterEggMenu() {
 
-       //urlAdd();
-       devtro();
-       konamiCode();
-       mapMenu();
-       
+    //urlAdd();
+    devtro();
+    konamiCode();
+    mapMenu(hkey);
+
 }
 
 function konamiCode() {
